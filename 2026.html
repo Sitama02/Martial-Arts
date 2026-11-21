@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحليل اشتراكات الألعاب القتالية والأنشطة الرياضية — نوفمبر 2026</title>
+
+  <!-- Google Fonts: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              850: '#131c31',
+              900: '#0f172a',
+              950: '#090e1a',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* Base typography & smooth transitions */
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Smooth tab panel fade-in */
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .tab-animate {
+      animation: fadeSlideIn 0.25s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F8FAFC] text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="mobileBackdrop" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
+  <div class="flex min-h-screen">
+    <!-- ==================== SIDEBAR (Executive Dark Navy) ==================== -->
+    <aside id="sidebar" class="fixed lg:sticky top-0 right-0 z-50 h-screen w-72 bg-navy-900 text-slate-200 flex flex-col justify-between shadow-2xl transform translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
+      <div>
+        <!-- Brand Header -->
+        <div class="px-6 py-6 border-b border-slate-800/80 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-sm font-bold text-white leading-snug">تحليل الأنشطة الرياضية</h1>
+              <p class="text-[11px] text-slate-400 font-medium">نوفمبر 2026 • لوحة الإدارة العليا</p>
+            </div>
+          </div>
+          <!-- Close button on mobile -->
+          <button onclick="toggleMobileSidebar(false)" class="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="p-4 space-y-1.5" aria-label="القائمة الرئيسية">
+          <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">أقسام التحليل</p>
+
+          <button onclick="switchTab('overview')" data-tab="overview" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-right">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+            </svg>
+            <span>نظرة تنفيذية</span>
+          </button>
+
+          <button onclick="switchTab('sports')" data-tab="sports" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-right">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+            </svg>
+            <span>أداء الرياضات</span>
+          </button>
+
+          <button onclick="switchTab('trends')" data-tab="trends" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-right">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+            <span>تحليل الأيام والاتجاهات</span>
+          </button>
+
+          <button onclick="switchTab('pt_kids')" data-tab="pt_kids" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-right">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+            </svg>
+            <span>البرايفت والجروبات والأطفال</span>
+          </button>
+
+          <button onclick="switchTab('insights')" data-tab="insights" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-right">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+            </svg>
+            <span>التوصيات وتدقيق البيانات</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer Metadata -->
+      <div class="p-4 m-4 rounded-xl bg-slate-800/60 border border-slate-700/50 text-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-300">
+          <span>نطاق البيانات:</span>
+          <span class="font-bold text-white" dir="ltr">7 – 19 Nov 2026</span>
+        </div>
+        <div class="flex items-center justify-between text-slate-300">
+          <span>المصدر:</span>
+          <span class="font-semibold text-emerald-400">شيت فعلي 100%</span>
+        </div>
+        <div class="pt-1.5 border-t border-slate-700/60 flex items-center gap-1.5 text-[11px] text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+          <span>مطابق للإجمالي 237,615.5 (160 سجل)</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN WORKSPACE ==================== -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- Top Header & Sticky Global Interactive Filter Bar -->
+      <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
+        <!-- Title Row -->
+        <div class="px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <!-- Mobile menu toggle -->
+            <button onclick="toggleMobileSidebar(true)" class="lg:hidden p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">لوحة تحليل اشتراكات الألعاب القتالية والأنشطة الرياضية — نوفمبر 2026</h2>
+              <p id="currentTabSubtitle" class="text-xs text-slate-500 mt-0.5">نظرة تنفيذية شاملة على الأداء التشغيلي والمالي</p>
+            </div>
+          </div>
+
+          <!-- Live Record Count Badge & Reset -->
+          <div class="flex items-center gap-2.5">
+            <div id="filterBadge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold">
+              <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+              <span id="filteredCountText">عرض 160 من 160 سجل</span>
+            </div>
+            <button onclick="resetFilters()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border border-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              <span>إعادة تعيين الفلاتر</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5 Cross-Filters Row -->
+        <div class="px-4 sm:px-6 lg:px-8 py-2.5 bg-slate-50/90 border-t border-slate-200/70">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+            <!-- 1. Sport -->
+            <div>
+              <label for="filterSport" class="block text-[11px] font-bold text-slate-500 mb-1">الرياضة</label>
+              <select id="filterSport" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+                <option value="ALL">الكل (6 رياضات)</option>
+                <option value="Jiu-Jitsu">Jiu-Jitsu</option>
+                <option value="MMA">MMA</option>
+                <option value="MT">MT</option>
+                <option value="Boxing">Boxing</option>
+                <option value="Aikido">Aikido</option>
+                <option value="Rugby">Rugby</option>
+              </select>
+            </div>
+
+            <!-- 2. Training Type -->
+            <div>
+              <label for="filterType" class="block text-[11px] font-bold text-slate-500 mb-1">نوع التدريب</label>
+              <select id="filterType" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+                <option value="ALL">الكل (Group + PT)</option>
+                <option value="Group">جماعي (Group)</option>
+                <option value="PT">تدريب خاص (PT)</option>
+              </select>
+            </div>
+
+            <!-- 3. Age Group -->
+            <div>
+              <label for="filterAge" class="block text-[11px] font-bold text-slate-500 mb-1">الفئة العمرية</label>
+              <select id="filterAge" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+                <option value="ALL">الكل (بالغين + أطفال)</option>
+                <option value="Adults">بالغين (Adults)</option>
+                <option value="Kids">أطفال (Kids - K)</option>
+              </select>
+            </div>
+
+            <!-- 4. Day of Week -->
+            <div>
+              <label for="filterDay" class="block text-[11px] font-bold text-slate-500 mb-1">يوم الأسبوع</label>
+              <select id="filterDay" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition">
+                <option value="ALL">كل أيام الأسبوع</option>
+                <option value="السبت">السبت</option>
+                <option value="الاحد">الاحد</option>
+                <option value="الاثنين">الاثنين</option>
+                <option value="الثلاثاء">الثلاثاء</option>
+                <option value="الاربعاء">الاربعاء</option>
+                <option value="الخميس">الخميس</option>
+                <option value="الجمعة">الجمعة</option>
+              </select>
+            </div>
+
+            <!-- 5. Date -->
+            <div class="col-span-2 sm:col-span-1">
+              <label for="filterDate" class="block text-[11px] font-bold text-slate-500 mb-1">التاريخ</label>
+              <select id="filterDate" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" dir="ltr">
+                <option value="ALL">كل التواريخ (13 يوم)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1600px] w-full mx-auto">
+
+        <!-- Empty State Banner (shown when filters return 0 records) -->
+        <div id="emptyState" class="hidden mb-6 rounded-2xl bg-amber-50 border border-amber-200 p-6 text-center">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-amber-900">لا توجد بيانات مطابقة للفلاتر المحددة</h3>
+          <p class="text-xs text-amber-700 mt-1">يرجى تعديل اختيارات التصفية أو الضغط على زر إعادة تعيين الفلاتر لعرض جميع السجلات.</p>
+        </div>
+
+        <!-- ==================== TAB 1: EXECUTIVE OVERVIEW ==================== -->
+        <section id="tab-overview" class="tab-panel space-y-6 tab-animate">
+          <!-- 6 KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            <!-- KPI 1: Total Subscriptions -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">إجمالي الاشتراكات</p>
+                  <h3 id="kpiTotalSubs" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5">160</h3>
+                  <p id="kpiUniqueMembers" class="text-xs font-semibold text-indigo-600 mt-1.5">139 مشترك فريد (حسب الاسم المسجل)</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 2: Total Revenue -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">إجمالي الإيرادات المسجلة</p>
+                  <h3 id="kpiTotalRev" class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-1.5" dir="ltr">237,615.5</h3>
+                  <p id="kpiRevSub" class="text-xs font-semibold text-slate-500 mt-1.5">مطابق لإجمالي الشيت بدون افتراضات</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 3: Average Ticket -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">متوسط قيمة الاشتراك</p>
+                  <h3 id="kpiAvgTicket" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5" dir="ltr">1,485.1</h3>
+                  <p id="kpiSportsCount" class="text-xs font-semibold text-amber-600 mt-1.5">عبر 6 أنشطة رياضية نشطة</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 4: Top Sport by Count -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">أكثر رياضة اشتراكاً</p>
+                  <h3 id="kpiTopSportCount" class="text-2xl font-extrabold text-indigo-700 mt-1.5">Jiu-Jitsu</h3>
+                  <p id="kpiTopSportCountSub" class="text-xs font-semibold text-slate-600 mt-1.5">41 اشتراكاً (25.6% من الإجمالي)</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 5: Top Sport by Revenue -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">أعلى رياضة إيراداً</p>
+                  <h3 id="kpiTopSportRev" class="text-2xl font-extrabold text-emerald-700 mt-1.5">Jiu-Jitsu</h3>
+                  <p id="kpiTopSportRevSub" class="text-xs font-semibold text-slate-600 mt-1.5">69,550 (29.3% من الإيرادات)</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI 6: Busiest Day of Week -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-500">أكثر أيام الأسبوع نشاطاً</p>
+                  <h3 id="kpiTopDay" class="text-2xl font-extrabold text-rose-600 mt-1.5">السبت</h3>
+                  <p id="kpiTopDaySub" class="text-xs font-semibold text-slate-600 mt-1.5">41 اشتراكاً • إيراد 52,037.5</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2 Charts Side-by-Side -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Revenue by Sport (Horizontal Bar) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">إجمالي الإيرادات حسب الرياضة</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">مقارنة المساهمة المالية لكل نشاط رياضي (مرتبة تنازلياً)</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold">تحليل مالي</span>
+              </div>
+              <div class="relative h-72 sm:h-80 w-full">
+                <canvas id="chartOverviewRev"></canvas>
+              </div>
+            </div>
+
+            <!-- Subscriptions Share by Sport (Doughnut) -->
+            <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">حصة الاشتراكات حسب الرياضة</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">التوزيع النسبي لعدد السجلات على الأنشطة الستة</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-bold">حجم الإقبال</span>
+              </div>
+              <div class="relative h-72 sm:h-80 w-full flex items-center justify-center">
+                <canvas id="chartOverviewShare"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Executive Highlights Banner -->
+          <div class="rounded-2xl bg-gradient-to-l from-navy-900 via-slate-900 to-indigo-950 text-white p-6 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold">ملخص تنفيذي سريع (محسوب تلقائياً حسب الفلتر الحالي)</h3>
+                  <p class="text-xs text-slate-300">أبرز المؤشرات الفورية لدعم قرار إدارة التشغيل</p>
+                </div>
+              </div>
+              <button onclick="switchTab('insights')" class="self-start md:self-auto px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-xs font-bold transition cursor-pointer">
+                عرض التقرير والتوصيات الكاملة ←
+              </button>
+            </div>
+            <div id="executiveBannerGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs leading-relaxed">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 2: SPORTS PERFORMANCE ==================== -->
+        <section id="tab-sports" class="tab-panel hidden space-y-6 tab-animate">
+          <!-- 2 Single-Axis Charts Side-by-Side -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <h3 class="text-base font-bold text-slate-900">عدد الاشتراكات لكل رياضة</h3>
+              <p class="text-xs text-slate-500 mt-0.5 mb-4">مقارنة حجم الإقبال الفعلي بين الأنشطة الستة</p>
+              <div class="relative h-72 w-full">
+                <canvas id="chartSportsCount"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <h3 class="text-base font-bold text-slate-900">متوسط قيمة الاشتراك لكل رياضة</h3>
+              <p class="text-xs text-slate-500 mt-0.5 mb-4">يكشف الفرق بين الأنشطة المعتمدة على الباقات الشهرية مقابل الحصص الفردية</p>
+              <div class="relative h-72 w-full">
+                <canvas id="chartSportsAvg"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comprehensive Ranked Performance Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">جدول الأداء الترتيبي للرياضات</h3>
+                <p class="text-xs text-slate-500 mt-0.5">مقارنة شاملة للأعداد، المشتركين الفريدين، الإيرادات، ومتوسطات التسعير (مرتبة حسب الإيرادات)</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">بدون أرقام إيصالات</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs sm:text-sm">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <tr>
+                    <th class="py-3.5 px-4 font-bold">الترتيب</th>
+                    <th class="py-3.5 px-4 font-bold">الرياضة</th>
+                    <th class="py-3.5 px-4 font-bold">عدد الاشتراكات</th>
+                    <th class="py-3.5 px-4 font-bold">المشتركين الفريدين</th>
+                    <th class="py-3.5 px-4 font-bold">النسبة من الاشتراكات</th>
+                    <th class="py-3.5 px-4 font-bold">إجمالي الإيرادات</th>
+                    <th class="py-3.5 px-4 font-bold">النسبة من الإيرادات</th>
+                    <th class="py-3.5 px-4 font-bold">متوسط الاشتراك</th>
+                    <th class="py-3.5 px-4 font-bold">أقل / أعلى قيمة</th>
+                  </tr>
+                </thead>
+                <tbody id="sportsRankTableBody" class="divide-y divide-slate-100">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Interactive Searchable Transactions Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">سجل الاشتراكات التفصيلي</h3>
+                <p class="text-xs text-slate-500 mt-0.5">يعرض جميع السجلات المطابقة للفلاتر مع إمكانية البحث باسم المشترك أو الملاحظات (تم استبعاد أرقام الإيصالات)</p>
+              </div>
+              <div class="relative w-full sm:w-72">
+                <input id="txSearchInput" type="text" oninput="renderTransactionsTable()" placeholder="ابحث باسم المشترك أو الملاحظات..." class="w-full rounded-xl border border-slate-200 bg-slate-50 pr-9 pl-3 py-2 text-xs font-semibold text-slate-700 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition" />
+                <svg class="w-4 h-4 text-slate-400 absolute right-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+            </div>
+            <div class="overflow-x-auto max-h-[460px] overflow-y-auto">
+              <table class="w-full text-right text-xs">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="py-3 px-4 font-bold">التاريخ</th>
+                    <th class="py-3 px-4 font-bold">اليوم</th>
+                    <th class="py-3 px-4 font-bold">اسم المشترك</th>
+                    <th class="py-3 px-4 font-bold">الرياضة</th>
+                    <th class="py-3 px-4 font-bold">النوع</th>
+                    <th class="py-3 px-4 font-bold">الفئة</th>
+                    <th class="py-3 px-4 font-bold">القيمة</th>
+                    <th class="py-3 px-4 font-bold">ملاحظات</th>
+                  </tr>
+                </thead>
+                <tbody id="txTableBody" class="divide-y divide-slate-100">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
+              <span id="txCountLabel">إجمالي السجلات المعروضة: 160</span>
+              <span id="txSumLabel" dir="ltr">الإجمالي: 237,615.5</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 3: SUBSCRIPTION TRENDS ==================== -->
+        <section id="tab-trends" class="tab-panel hidden space-y-6 tab-animate">
+          <!-- Methodological Note Badge -->
+          <div class="rounded-2xl bg-amber-50 border border-amber-200/90 px-5 py-3.5 flex items-start gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+              </svg>
+            </div>
+            <div class="text-xs leading-relaxed text-amber-900">
+              <span class="font-extrabold">ملاحظة إحصائية مهمة حول أيام الأسبوع:</span>
+              تمتد فترة البيانات لـ <strong>13 يوماً</strong> (من السبت 7 نوفمبر إلى الخميس 19 نوفمبر 2026)، وبالتالي تكررت جميع أيام الأسبوع <strong>مرتين</strong> باستثناء <strong>يوم الجمعة</strong> الذي ظهر <strong>مرة واحدة فقط</strong> (13 نوفمبر). يُراعى ذلك عند مقارنة يوم الجمعة ببقية الأيام.
+            </div>
+          </div>
+
+          <!-- 2 Weekday Bar Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <h3 class="text-base font-bold text-slate-900">عدد الاشتراكات حسب أيام الأسبوع</h3>
+              <p class="text-xs text-slate-500 mt-0.5 mb-4">السبت إلى الجمعة — لتحديد أيام الذروة والأيام الهادئة</p>
+              <div class="relative h-72 w-full">
+                <canvas id="chartDaysCount"></canvas>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <h3 class="text-base font-bold text-slate-900">الإيرادات حسب أيام الأسبوع</h3>
+              <p class="text-xs text-slate-500 mt-0.5 mb-4">توزيع التحصيل المالي على أيام الأسبوع السبعة</p>
+              <div class="relative h-72 w-full">
+                <canvas id="chartDaysRev"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Trend Line Chart with Toggle -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 class="text-base font-bold text-slate-900">الاتجاه اليومي للاشتراكات والإيرادات (7 – 19 نوفمبر 2026)</h3>
+                <p class="text-xs text-slate-500 mt-0.5">تتبع الأداء اليومي على مدار الـ 13 يوماً لاكتشاف القفزات والانخفاضات</p>
+              </div>
+              <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                <button id="btnTrendRev" onclick="setDailyTrendMode('revenue')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer">الإيرادات اليومية</button>
+                <button id="btnTrendCount" onclick="setDailyTrendMode('count')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer">عدد الاشتراكات</button>
+              </div>
+            </div>
+            <div class="relative h-72 sm:h-80 w-full">
+              <canvas id="chartDailyTrend"></canvas>
+            </div>
+          </div>
+
+          <!-- Sport × Day of Week Matrix Heatmap Table -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="p-5 border-b border-slate-100">
+              <h3 class="text-base font-bold text-slate-900">مصفوفة تركز الرياضات حسب أيام الأسبوع (Sport × Day Matrix)</h3>
+              <p class="text-xs text-slate-500 mt-0.5">توضح كثافة الاشتراكات لكل رياضة في كل يوم (مثلاً: Rugby بنسبة 100% يوم الثلاثاء، وAikido يومي الجمعة والسبت فقط)</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-center text-xs sm:text-sm">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <tr>
+                    <th class="py-3.5 px-4 text-right font-bold">الرياضة</th>
+                    <th class="py-3.5 px-3 font-bold">السبت</th>
+                    <th class="py-3.5 px-3 font-bold">الاحد</th>
+                    <th class="py-3.5 px-3 font-bold">الاثنين</th>
+                    <th class="py-3.5 px-3 font-bold">الثلاثاء</th>
+                    <th class="py-3.5 px-3 font-bold">الاربعاء</th>
+                    <th class="py-3.5 px-3 font-bold">الخميس</th>
+                    <th class="py-3.5 px-3 font-bold">الجمعة*</th>
+                    <th class="py-3.5 px-4 font-bold bg-slate-100">الإجمالي</th>
+                  </tr>
+                </thead>
+                <tbody id="matrixTableBody" class="divide-y divide-slate-100">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 4: PT VS GROUP & KIDS ==================== -->
+        <section id="tab-pt_kids" class="tab-panel hidden space-y-6 tab-animate">
+          <!-- Top 3 Summary KPI Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Group KPI -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs border-r-4 border-r-indigo-500">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">الاشتراكات الجماعية (Group)</span>
+                <span id="kpiGroupPct" class="text-sm font-extrabold text-indigo-700">85.6%</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <div>
+                  <p class="text-[11px] text-slate-500 font-semibold">عدد الاشتراكات</p>
+                  <h4 id="kpiGroupCount" class="text-2xl font-extrabold text-slate-900">137</h4>
+                </div>
+                <div class="text-left">
+                  <p class="text-[11px] text-slate-500 font-semibold">إجمالي الإيرادات</p>
+                  <h4 id="kpiGroupRev" class="text-xl font-extrabold text-emerald-700" dir="ltr">190,562.5</h4>
+                </div>
+              </div>
+              <p id="kpiGroupAvg" class="text-xs text-slate-500 font-semibold mt-2.5 pt-2 border-t border-slate-100">متوسط الاشتراك: 1,391.0</p>
+            </div>
+
+            <!-- PT KPI -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs border-r-4 border-r-amber-500">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg">التدريب الخاص (PT)</span>
+                <span id="kpiPtPct" class="text-sm font-extrabold text-amber-700">14.4%</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <div>
+                  <p class="text-[11px] text-slate-500 font-semibold">عدد الاشتراكات</p>
+                  <h4 id="kpiPtCount" class="text-2xl font-extrabold text-slate-900">23</h4>
+                </div>
+                <div class="text-left">
+                  <p class="text-[11px] text-slate-500 font-semibold">إجمالي الإيرادات</p>
+                  <h4 id="kpiPtRev" class="text-xl font-extrabold text-emerald-700" dir="ltr">47,053</h4>
+                </div>
+              </div>
+              <p id="kpiPtAvg" class="text-xs text-slate-500 font-semibold mt-2.5 pt-2 border-t border-slate-100">متوسط الاشتراك: 2,045.8</p>
+            </div>
+
+            <!-- Kids KPI -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs border-r-4 border-r-rose-500">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg">قطاع الأطفال (Kids - K)</span>
+                <span id="kpiKidsPct" class="text-sm font-extrabold text-rose-700">6.3%</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <div>
+                  <p class="text-[11px] text-slate-500 font-semibold">عدد اشتراكات الأطفال</p>
+                  <h4 id="kpiKidsCount" class="text-2xl font-extrabold text-slate-900">10</h4>
+                </div>
+                <div class="text-left">
+                  <p class="text-[11px] text-slate-500 font-semibold">إيرادات الأطفال</p>
+                  <h4 id="kpiKidsRev" class="text-xl font-extrabold text-emerald-700" dir="ltr">11,753</h4>
+                </div>
+              </div>
+              <p id="kpiKidsOverlap" class="text-[11px] text-rose-600 font-semibold mt-2.5 pt-2 border-t border-slate-100">يشمل 3 سجلات K+PT (تُحتسب مرة واحدة دون ازدواجية)</p>
+            </div>
+          </div>
+
+          <!-- Stacked Bar Chart: PT vs Group per Sport -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900">توزيع التدريب الخاص (PT) مقابل الجماعي (Group) لكل رياضة</h3>
+            <p class="text-xs text-slate-500 mt-0.5 mb-4">يُظهر مدى اعتماد كل نشاط على التدريب الخاص أو الجماعي</p>
+            <div class="relative h-72 w-full">
+              <canvas id="chartPtVsGroup"></canvas>
+            </div>
+          </div>
+
+          <!-- Detailed Comparison Table per Sport (PT vs Group) -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="p-5 border-b border-slate-100">
+              <h3 class="text-base font-bold text-slate-900">جدول مقارنة البرايفت (PT) والجروبات (Group) لكل رياضة</h3>
+              <p class="text-xs text-slate-500 mt-0.5">تحليل تفصيلي للأعداد والنسب والإيرادات والنوع الأكثر انتشاراً داخل كل نشاط</p>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-right text-xs sm:text-sm">
+                <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <tr>
+                    <th class="py-3.5 px-4 font-bold">الرياضة</th>
+                    <th class="py-3.5 px-4 font-bold">الإجمالي</th>
+                    <th class="py-3.5 px-4 font-bold">عدد PT</th>
+                    <th class="py-3.5 px-4 font-bold">عدد Group</th>
+                    <th class="py-3.5 px-4 font-bold">نسبة PT%</th>
+                    <th class="py-3.5 px-4 font-bold">نسبة Group%</th>
+                    <th class="py-3.5 px-4 font-bold">إيرادات PT</th>
+                    <th class="py-3.5 px-4 font-bold">إيرادات Group</th>
+                    <th class="py-3.5 px-4 font-bold">النوع الأكثر انتشاراً</th>
+                  </tr>
+                </thead>
+                <tbody id="ptGroupTableBody" class="divide-y divide-slate-100">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Dedicated Kids (K) vs Adults Analysis Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <h3 class="text-base font-bold text-slate-900">توزيع الأطفال (K) مقابل البالغين (Adults)</h3>
+              <p class="text-xs text-slate-500 mt-0.5 mb-4">تم دمج اشتراكات K مع رياضتها الأساسية مع فصلها هنا للتحليل العمري</p>
+              <div class="relative h-72 w-full">
+                <canvas id="chartKidsVsAdults"></canvas>
+              </div>
+            </div>
+
+            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col justify-between">
+              <div>
+                <div class="p-5 border-b border-slate-100">
+                  <h3 class="text-base font-bold text-slate-900">تحليل قطاع الأطفال (K) داخل كل رياضة</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">تستحوذ رياضة MT على 100% من اشتراكات الأطفال المسجلة (10 سجلات = 30.3% من MT، بينها 3 سجلات M.T.K.PT)</p>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-right text-xs sm:text-sm">
+                    <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                      <tr>
+                        <th class="py-3 px-4 font-bold">الرياضة</th>
+                        <th class="py-3 px-4 font-bold">الإجمالي</th>
+                        <th class="py-3 px-4 font-bold">بالغين (Adults)</th>
+                        <th class="py-3 px-4 font-bold">أطفال (Kids - K)</th>
+                        <th class="py-3 px-4 font-bold">نسبة الأطفال</th>
+                        <th class="py-3 px-4 font-bold">منهم K+PT</th>
+                        <th class="py-3 px-4 font-bold">إيرادات الأطفال</th>
+                      </tr>
+                    </thead>
+                    <tbody id="kidsTableBody" class="divide-y divide-slate-100">
+                      <!-- Populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="p-4 bg-rose-50/70 border-t border-rose-100 text-xs text-rose-900 leading-relaxed">
+                <strong>قاعدة منع الازدواجية:</strong> السجلات الثلاثة المصنفة <span dir="ltr" class="font-bold">M.T.K.PT</span> (على محمد جوان، حمزة عمر خراشى، حبيبة اسلام محمد — بإجمالي إيراد 6,653) تُحتسب <strong>مرة واحدة فقط</strong> في إجمالي الاشتراكات (160) وتظهر ضمن تحليلات الأطفال وPT معاً بدقة تامة.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 5: MANAGEMENT INSIGHTS & DATA AUDIT ==================== -->
+        <section id="tab-insights" class="tab-panel hidden space-y-6 tab-animate">
+
+          <!-- Strengths & Weaknesses Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Strengths -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">نقاط القوة الرئيسية (Strengths)</h3>
+                  <p class="text-xs text-slate-500">استناداً إلى الأرقام الفعلية للفترة 7–19 نوفمبر 2026</p>
+                </div>
+              </div>
+              <ul class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                  <span><strong>تركز إيرادي قوي في 3 رياضات قيادية:</strong> تحقق رياضات <strong>Jiu-Jitsu</strong> (29.3% بإيراد 69,550)، و<strong>MMA</strong> (29.2% بإيراد 69,425)، و<strong>MT</strong> (24.2% بإيراد 57,578) ما نسبته <strong>82.7%</strong> من إجمالي الإيرادات (196,553 من أصل 237,615.5).</span>
+                </li>
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                  <span><strong>عائد مرتفع للتدريب الخاص (PT):</strong> يحقق اشتراك PT متوسط قيمة أعلى بنسبة <strong>47.1%</strong> من الجماعي (<strong>2,045.8</strong> مقابل <strong>1,391.0</strong>)، ويساهم بـ <strong>19.8%</strong> من الإيرادات (47,053) رغم أنه يمثل <strong>14.4%</strong> فقط من عدد السجلات (23 سجلاً).</span>
+                </li>
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                  <span><strong>نجاح نموذج الأطفال (K) في MT:</strong> تستحوذ اشتراكات الأطفال على <strong>30.3%</strong> من إجمالي سجلات MT (10 من 33 سجلاً بإيراد 11,753)، منها 3 اشتراكات أطفال PT بمتوسط مرتفع يتجاوز 2,200.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Weaknesses -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">نقاط الضعف والتحديات (Weaknesses)</h3>
+                  <p class="text-xs text-slate-500">فجوات تشغيلية وتجارية تستدعي تدخلاً إدارياً</p>
+                </div>
+              </div>
+              <ul class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                  <span class="w-2 h-2 rounded-full bg-rose-500 mt-2 shrink-0"></span>
+                  <span><strong>ضعف العائد المالي في Aikido وRugby:</strong> تعمل الرياضتان بالكامل بنظام الحصة الواحدة بقيمة <strong>120</strong> فقط (14 سجلاً للـ Aikido بإيراد 1,680 و9 سجلات للـ Rugby بإيراد 1,080)، ولا توجد أي باقات شهرية، ما يجعلهما تساهمان بـ <strong>1.16%</strong> فقط من إجمالي الإيرادات رغم 14.4% من عدد السجلات.</span>
+                </li>
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                  <span class="w-2 h-2 rounded-full bg-rose-500 mt-2 shrink-0"></span>
+                  <span><strong>غياب كامل للتدريب الخاص (PT) في Jiu-Jitsu:</strong> رغم تصدرها المركز الأول في عدد الاشتراكات (41 سجلاً = 25.6%) والإيرادات (69,550)، لم يُسجل فيها <strong>أي اشتراك PT (0%)</strong>.</span>
+                </li>
+                <li class="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                  <span class="w-2 h-2 rounded-full bg-rose-500 mt-2 shrink-0"></span>
+                  <span><strong>انعدام برامج الأطفال خارج MT وهبوط نهاية الأسبوع:</strong> لا يوجد أي اشتراك أطفال (K) مسجل في Jiu-Jitsu أو MMA أو Boxing، كما يشهد يوم <strong>الخميس</strong> هبوطاً حاداً (6 سجلات فقط خلال أسبوعين) ويوم <strong>الجمعة</strong> (5 سجلات في يوم واحد).</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Actionable Recommendations -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-slate-900">فرص النمو والتوصيات العملية للإدارة (Actionable Recommendations)</h3>
+                <p class="text-xs text-slate-500">خطوات تنفيذية مرتبطة مباشرة بالأرقام الفعلية لتعظيم الإيرادات</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-indigo-700">1. إطلاق PT في Jiu-Jitsu وتوسيعه في Boxing</span>
+                  <span class="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 text-[11px] font-bold">أولوية قصوى</span>
+                </div>
+                <p class="text-slate-600 leading-relaxed">تمتلك Jiu-Jitsu أكبر قاعدة عملاء (41 سجلاً) بنسبة 0% PT، بينما تسجل Boxing اشتراكي PT فقط من أصل 26 (7.7%). تحويل 15% فقط من مشتركي Jiu-Jitsu إلى باقات PT بمتوسط 2,200 يضيف إيراداً فورياً عالي الهامش.</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-emerald-700">2. تحويل مشتركي الحصص الفردية إلى باقات شهرية</span>
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[11px] font-bold">تعظيم الإيراد</span>
+                </div>
+                <p class="text-slate-600 leading-relaxed">يوجد <strong>74 سجلاً</strong> بقيمة ≤ 600 (حصص فردية وتجريبية)، إضافة إلى 100% من سجلات Aikido (14) وRugby (9) بسعر 120 للحصة. تقديم باقة شهرية أو باقة 8 حصص سترفع متوسط التذكرة واستقرار التدفق النقدي.</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-rose-700">3. استنساخ نموذج أطفال MT في الرياضات القتالية</span>
+                  <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 text-[11px] font-bold">توسع سوقي</span>
+                </div>
+                <p class="text-slate-600 leading-relaxed">أثبت برنامج MT Kids (K) طلباً قوياً (30.3% من MT). إطلاق فصول Kids مخصصة في Jiu-Jitsu وBoxing وMMA يفتح شريحة عمرية غير مستغلة حالياً (0 سجلات أطفال في 5 رياضات).</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-extrabold text-amber-700">4. استغلال ذروة السبت والثلاثاء وتنشيط الخميس والجمعة</span>
+                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[11px] font-bold">تحسين الجدول</span>
+                </div>
+                <p class="text-slate-600 leading-relaxed">توجيه عروض الترقية (Upsell) في يومي الذروة (السبت: 41 سجلاً، الثلاثاء: 34 سجلاً)، وطرح عروض "الحصة التجريبية" وورش عمل خاصة يومي الخميس (6 سجلات) والجمعة (5 سجلات) لرفع إشغال القاعات.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Executive 10-Question Summary -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900 mb-4">التقرير التنفيذي المباشر (إجابات الأسئلة الـ 10 للإدارة العليا)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs leading-relaxed">
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">1. أكثر رياضة إقبالاً:</strong> Jiu-Jitsu (41 اشتراكاً — 25.6%).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">2. أقل رياضة إقبالاً:</strong> Rugby (9 اشتراكات — 5.6%).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">3. أعلى رياضة إيراداً:</strong> Jiu-Jitsu (69,550 — 29.3%) تليها MMA بفارق ضئيل جداً (69,425 — 29.2%).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">4. الرياضات المحتاجة لتطوير:</strong> Aikido وRugby (إيراد 120 فقط بدون باقات)، وBoxing (رفع نسبة PT).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">5. أفضل أيام الأسبوع:</strong> السبت (41 اشتراكاً / 52,037.5) يليه الثلاثاء (34 اشتراكاً) والاثنين (26 اشتراكاً).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">6. البرايفت أم الجروبات:</strong> الجروبات أكثر انتشاراً (85.6% — 137 سجلاً) مقابل PT (14.4% — 23 سجلاً).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">7. الأكثر طلباً على PT:</strong> MMA (11 اشتراك PT — 29.7% من MMA) تليها MT (10 اشتراكات PT — 30.3% من MT).</div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100"><strong class="text-slate-900">8. الأكثر طلباً على Group:</strong> Jiu-Jitsu (41 اشتراكاً — 100% جماعي) تليها MMA (26) وBoxing (24).</div>
+              <div class="p-3 rounded-xl bg-indigo-50/60 border border-indigo-100 md:col-span-2"><strong class="text-indigo-900">9. أفضل 3 فرص لزيادة الإيرادات:</strong> (أ) إطلاق باقات PT في Jiu-Jitsu، (ب) تحويل 74 سجل حصص فردية (خاصة Aikido وRugby) إلى باقات شهرية، (ج) التوسع في برامج الأطفال (K) داخل Jiu-Jitsu وBoxing وMMA.</div>
+              <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100 md:col-span-2"><strong class="text-emerald-900">10. أهم 5 قرارات إدارية مقترحة:</strong> (1) تسعير وإطلاق PT للـ Jiu-Jitsu فوراً، (2) تصميم باقات شهرية لـ Aikido وRugby بدلاً من الحصة الفردية، (3) استنساخ برنامج MT Kids في بقية الرياضات، (4) إطلاق حملات تنشيطية ليومي الخميس والجمعة، (5) توحيد إدخال أسماء المشتركين في الشيت لمنع التكرار الإملائي وتتبع تحويل التجريبي لشهري.</div>
+            </div>
+          </div>
+
+          <!-- Data Quality Audit & Transparency -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-slate-900">تدقيق جودة البيانات والشفافية (Data Quality Audit)</h3>
+                <p class="text-xs text-slate-500">توثيق كامل لمطابقة الأرقام، التكرارات، والفروقات الإملائية دون حذف أو تعديل صامت</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                <h4 class="font-bold text-slate-900 mb-1.5">أ) المطابقة المالية والعددية (100%)</h4>
+                <p class="text-slate-600">إجمالي السجلات المحللة هو <strong>160 سجلاً</strong> بإجمالي إيرادات <strong>237,615.5</strong> مطابقاً بنسبة 100% لإجمالي شيت Excel المرفق. لم يتم استخدام أرقام الإيصالات في أي حسابات أو مقارنات، كما لم تُفترض أي مبالغ غير مسجلة.</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                <h4 class="font-bold text-slate-900 mb-1.5">ب) المشتركون الفريدون وتكرار السجلات</h4>
+                <p class="text-slate-600">يوجد <strong>139 اسماً فريداً</strong> بالتطابق الحرفي؛ حيث تكرر <strong>19 اسماً</strong> عبر <strong>40 سجلاً</strong> لأسباب تشغيلية حقيقية: استكمال دفعات (مثل: <em>يوسف محمد حسنى</em> 350 + 50)، ترقية من تجريبي إلى باقة (مثل: <em>كامل احمد</em> 400 + 2100)، تكرار حصص فردية (مثل: <em>عمر محمد حمدى</em> 3×300)، و<strong>4 مشتركين</strong> في أكثر من رياضة.</p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200/70">
+                <h4 class="font-bold text-amber-900 mb-1.5">ج) فروقات إملائية محتملة لنفس الشخص (4 حالات)</h4>
+                <ul class="list-disc list-inside text-amber-800 space-y-1">
+                  <li><strong>محمد عبد الحميد</strong> / <strong>محمد عبدالحميد</strong> (Boxing.PT + M.T.PT)</li>
+                  <li><strong>هنا بيزلير</strong> / <strong>هنا بيزلر</strong> (Jiu-Jitsu)</li>
+                  <li><strong>مازن عطوة</strong> / <strong>مازن عطوه</strong> (Jiu-Jitsu + MT)</li>
+                  <li><strong>محمد يسرى</strong> / <strong>محمد يسري</strong> (M.M.A.PT + M.M.A)</li>
+                </ul>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                <h4 class="font-bold text-slate-900 mb-1.5">د) قواعد تصنيف PT والأطفال (K)</h4>
+                <p class="text-slate-600">تم التعامل مع أي اشتراك ينتهي بـ <strong>PT</strong> كـ تدريب خاص (23 سجلاً) وبقية السجلات كـ جماعي (137 سجلاً) وفق طبيعة البيانات. كما دُمجت سجلات <strong>K</strong> (10 سجلات في MT) ضمن رياضتها الأساسية مع عدم مضاعفة السجلات الثلاثة المشتركة <strong>M.T.K.PT</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT APPLICATION ==================== -->
+  <script>
+    // =========================================================================
+    // 1. VERIFIED 160-ROW DATASET (Exact from Sheet — Total: 237,615.5)
+    // Columns: [date, day, sport, type, age, amount, member, rawType, notes]
+    // =========================================================================
+    const RAW_DATA = [["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"ادهم مصطفى","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",400,"كريم ياسر","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2125,"ادم محمد محمد على علاء الدين القاضى","جوجيتسو","خصم15%"],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"حسين وسام","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"احمد كمال سعد","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"ادم رائد","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"مؤمن ماهر","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",400,"كامل احمد","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",400,"عبدالملك محمد","جوجيتسو",""],["2026-11-07","السبت","Jiu-Jitsu","Group","Adults",2500,"عبدالرحمن مصطفى بيومى","جوجيتسو",""],["2026-11-08","الاحد","MMA","Group","Adults",2800,"محمد هشام رفاعى","M.M.A",""],["2026-11-08","الاحد","MMA","Group","Adults",400,"فارس محمد كمال","M.M.A",""],["2026-11-08","الاحد","MMA","Group","Adults",350,"يوسف محمد حسنى","M.M.A",""],["2026-11-08","الاحد","Jiu-Jitsu","Group","Adults",400,"يوسف محمد نايل","جوجيتسو",""],["2026-11-08","الاحد","Jiu-Jitsu","Group","Adults",2500,"عمر عماد","جوجيتسو",""],["2026-11-08","الاحد","Jiu-Jitsu","Group","Adults",2500,"تامر فؤاد جعفر","جوجيتسو",""],["2026-11-08","الاحد","MMA","Group","Adults",2800,"هنا ضياء محمد","M.M.A",""],["2026-11-08","الاحد","Jiu-Jitsu","Group","Adults",2500,"عبدالرحمن محمد ابراهيم","جوجيتسو",""],["2026-11-08","الاحد","MMA","Group","Adults",2800,"سليم اسامة المغربى","M.M.A",""],["2026-11-08","الاحد","MT","Group","Adults",2800,"الاء عصام الدين","M.T",""],["2026-11-09","الاثنين","MMA","Group","Adults",2800,"يوسف هشام حامد","M.M.A",""],["2026-11-09","الاثنين","Boxing","Group","Adults",2000,"محمد شريف يوسف","BOXING",""],["2026-11-09","الاثنين","Jiu-Jitsu","Group","Adults",400,"ياسين عمرو وردة","جوجيتسو",""],["2026-11-09","الاثنين","Boxing","Group","Adults",400,"اسلام محمد هلال","BOXING",""],["2026-11-09","الاثنين","Jiu-Jitsu","Group","Adults",2500,"خالد الغنيمى","جوجيتسو",""],["2026-11-09","الاثنين","MT","Group","Kids",300,"فاروق وسام","M.T.K",""],["2026-11-09","الاثنين","Boxing","Group","Adults",2000,"سيف محمد الدقاق","BOXING",""],["2026-11-09","الاثنين","Jiu-Jitsu","Group","Adults",400,"يحيي محمد محمود","جوجيتسو",""],["2026-11-09","الاثنين","Jiu-Jitsu","Group","Adults",2500,"بلال عجلان","جوجيتسو",""],["2026-11-10","الثلاثاء","MT","Group","Adults",400,"احمد علاء","M.T",""],["2026-11-10","الثلاثاء","MT","Group","Adults",2800,"عمرو محمد محمد","M.T",""],["2026-11-10","الثلاثاء","MT","Group","Adults",2800,"رياض الشافعي","M.T",""],["2026-11-10","الثلاثاء","MT","Group","Adults",2800,"تركي دياب","M.T",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",400,"يوسف فتيحة","M.M.A",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",2800,"محمد احمد المهدي","M.M.A",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",2800,"مسعد هلال احمد","M.M.A",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",400,"ياسين شقير","M.M.A",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",400,"عمر هيبة","M.M.A",""],["2026-11-10","الثلاثاء","MMA","Group","Adults",400,"عبدالله الرميزان","M.M.A",""],["2026-11-10","الثلاثاء","Jiu-Jitsu","Group","Adults",400,"محمد محمود زوا","جوجيتسو",""],["2026-11-10","الثلاثاء","Jiu-Jitsu","Group","Adults",400,"مصطفى ادهم محمود","جوجيتسو",""],["2026-11-11","الاربعاء","Boxing","Group","Adults",400,"مروان محمد ابراهيم","BOXING",""],["2026-11-11","الاربعاء","Boxing","Group","Adults",2000,"زياد احمد محمد","BOXING",""],["2026-11-11","الاربعاء","Boxing","Group","Adults",2000,"اياد السماك","BOXING",""],["2026-11-11","الاربعاء","Boxing","Group","Adults",400,"حسام حامد","BOXING",""],["2026-11-11","الاربعاء","Jiu-Jitsu","Group","Adults",2500,"ياسين عمر","جوجيتسو",""],["2026-11-11","الاربعاء","MT","Group","Kids",300,"عمر محمد حمدى","M.T.K",""],["2026-11-11","الاربعاء","Jiu-Jitsu","Group","Adults",2500,"على شريف عجاج","جوجيتسو",""],["2026-11-11","الاربعاء","MMA","Group","Adults",2800,"عبد الفتاح الفرماوى","M.M.A",""],["2026-11-12","الخميس","Boxing","Group","Adults",2000,"باتريك بيتر عزيز","BOXING",""],["2026-11-12","الخميس","Jiu-Jitsu","Group","Adults",2500,"سيف راشد سيف","جوجيتسو",""],["2026-11-12","الخميس","MT","Group","Adults",2800,"بلال عماد رشوان","M.T",""],["2026-11-12","الخميس","MT","Group","Adults",2800,"مالك احمد مصطفى","M.T",""],["2026-11-13","الجمعة","Boxing","Group","Adults",2000,"ادم محمد ايمن","BOXING",""],["2026-11-13","الجمعة","Aikido","Group","Adults",120,"على مرزوق","AIKIDO",""],["2026-11-13","الجمعة","Aikido","Group","Adults",120,"ارك دوفرلين","AIKIDO",""],["2026-11-13","الجمعة","Aikido","Group","Adults",120,"كريم محمد","AIKIDO",""],["2026-11-13","الجمعة","Aikido","Group","Adults",120,"الاء محمد","AIKIDO",""],["2026-11-14","السبت","Boxing","PT","Adults",2800,"احمد محمود رفعت","BOXING.PT",""],["2026-11-14","السبت","MT","Group","Kids",300,"عمر محمد حمدى","M.T.K",""],["2026-11-14","السبت","Boxing","Group","Adults",2000,"محمد القونى","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",2000,"زياد اشرف محمد","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",2000,"اياد اسامة","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",400,"صلاح الدين بهاء","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",400,"اسلام محمد هلال","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",400,"يوسف قطب","BOXING",""],["2026-11-14","السبت","Boxing","Group","Adults",400,"حسام نور","BOXING",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"رامزى محمود","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"فريد محمود","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"سوزان محمود","AIKIDO",""],["2026-11-14","السبت","MMA","PT","Adults",500,"اوس موسى احمد","M.M.A.PT",""],["2026-11-14","السبت","MMA","PT","Adults",500,"محمد عبد الكريم","M.M.A.PT",""],["2026-11-14","السبت","MMA","Group","Adults",500,"سارة ماهر","M.M.A",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"دنيا ابراهيم","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"على مرزوق","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"كريم محمد","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"ارك دوفرلين","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"سوزان محمد","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"فريد محمد","AIKIDO",""],["2026-11-14","السبت","Aikido","Group","Adults",120,"رمزى محمد","AIKIDO",""],["2026-11-14","السبت","MT","PT","Adults",600,"كريم محمد","M.T.PT",""],["2026-11-14","السبت","MMA","PT","Adults",1000,"محمد يسرى","M.M.A.PT",""],["2026-11-14","السبت","MMA","PT","Adults",1000,"احمد مسعود","M.M.A.PT",""],["2026-11-14","السبت","MMA","PT","Adults",2800,"يحيي هشام","M.M.A.PT",""],["2026-11-14","السبت","MMA","PT","Adults",2800,"بيتر عادل","M.M.A.PT",""],["2026-11-14","السبت","MMA","Group","Adults",2800,"احمد عبدالرحمن","M.M.A",""],["2026-11-14","السبت","MMA","Group","Adults",6672.5,"عمر محمد هريدى","M.M.A","خصم15%"],["2026-11-14","السبت","MT","PT","Kids",2200,"على محمد جوان","M.T.K.PT",""],["2026-11-14","السبت","MT","PT","Kids",2200,"حمزة عمر خراشى","M.T.K.PT",""],["2026-11-15","الاحد","Jiu-Jitsu","Group","Adults",2100,"كامل احمد","جوجيتسو",""],["2026-11-15","الاحد","Jiu-Jitsu","Group","Adults",2125,"على احمد البكرى","جوجيتسو","خصم15%"],["2026-11-15","الاحد","Boxing","PT","Adults",2200,"محمد عبد الحميد","BOXING.PT",""],["2026-11-15","الاحد","MT","PT","Adults",2650,"محمد عبدالحميد","M.T.PT",""],["2026-11-15","الاحد","MMA","Group","Adults",2800,"سيف علاء الدين","M.M.A",""],["2026-11-15","الاحد","Jiu-Jitsu","Group","Adults",400,"يوسف محمد نايل","جوجيتسو",""],["2026-11-15","الاحد","MMA","Group","Adults",400,"فراس الباشا","M.M.A",""],["2026-11-15","الاحد","MMA","Group","Adults",400,"فارس محمد كمال","M.M.A",""],["2026-11-15","الاحد","Jiu-Jitsu","Group","Adults",2500,"خالد البرقوقى","جوجيتسو",""],["2026-11-15","الاحد","MT","PT","Adults",600,"بلا عماد","M.T.PT",""],["2026-11-15","الاحد","MMA","PT","Adults",3750,"خالد محمد حسين","M.M.A.PT",""],["2026-11-15","الاحد","MT","Group","Adults",400,"جمعة غنيم","M.T",""],["2026-11-15","الاحد","MT","Group","Adults",400,"يحي  عرفة","M.T",""],["2026-11-15","الاحد","MT","Group","Adults",400,"محمد احمد المهدي","M.T",""],["2026-11-15","الاحد","MT","PT","Adults",3825,"يوسف محمد حربى","M.T.PT","خصم15%"],["2026-11-16","الاثنين","Boxing","Group","Adults",1700,"كارما عمرو","BOXING","خصم15%"],["2026-11-16","الاثنين","Boxing","Group","Adults",2000,"يوسف قطب","BOXING",""],["2026-11-16","الاثنين","Boxing","Group","Adults",2000,"صلاح الدين بهاء","BOXING",""],["2026-11-16","الاثنين","Boxing","Group","Adults",2000,"مازن عبدالرحمن زكريا","BOXING",""],["2026-11-16","الاثنين","Boxing","Group","Adults",400,"فهد فايد","BOXING",""],["2026-11-16","الاثنين","Boxing","Group","Adults",400,"سيف احمد","BOXING",""],["2026-11-16","الاثنين","MMA","PT","Adults",2687.5,"اوس موسى احمد","M.M.A.PT",""],["2026-11-16","الاثنين","MMA","PT","Adults",2687.5,"محمد عبد الكريم","M.M.A.PT",""],["2026-11-16","الاثنين","MMA","Group","Adults",2380,"اياد محمد محمد","M.M.A","خصم15%"],["2026-11-16","الاثنين","Jiu-Jitsu","Group","Adults",2500,"رامى محمد عبد اللطيف","جوجيتسو",""],["2026-11-16","الاثنين","Jiu-Jitsu","Group","Adults",400,"مازن عطوة","جوجيتسو",""],["2026-11-16","الاثنين","Jiu-Jitsu","Group","Adults",2500,"مينا سمير","جوجيتسو",""],["2026-11-16","الاثنين","Jiu-Jitsu","Group","Adults",400,"هنا بيزلير","جوجيتسو",""],["2026-11-16","الاثنين","MT","Group","Kids",1800,"رشيد كريم رزق","M.T.K",""],["2026-11-16","الاثنين","MT","PT","Adults",2650,"شروق محمد منصور","M.T.PT",""],["2026-11-16","الاثنين","MT","PT","Adults",2200,"مراد محمد كيلانى","M.T.PT",""],["2026-11-16","الاثنين","MT","PT","Adults",1750,"مروان شريف محمد","M.T.PT",""],["2026-11-17","الثلاثاء","Jiu-Jitsu","Group","Adults",400,"هنا بيزلر","جوجيتسو",""],["2026-11-17","الثلاثاء","Jiu-Jitsu","Group","Adults",2500,"علي عبدالحميد","جوجيتسو",""],["2026-11-17","الثلاثاء","Jiu-Jitsu","Group","Adults",2500,"كريم  محمود حنفي","جوجيتسو",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"عمر حلمي","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"رامي محمد","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"محمد احمد الدقاق","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"امير يونس","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"محمد الجمال","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"احمد عمرو احمد","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"احمد زكريا","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"مصطفى عمرو","RUGBY",""],["2026-11-17","الثلاثاء","Rugby","Group","Adults",120,"احمد سامي","RUGBY",""],["2026-11-17","الثلاثاء","MT","Group","Adults",2800,"عبدالرحمن جمال حجازي","M.T",""],["2026-11-17","الثلاثاء","MT","Group","Adults",2800,"شفيق محمد شفيق","M.T",""],["2026-11-17","الثلاثاء","MT","Group","Adults",400,"مازن عطوه","M.T",""],["2026-11-17","الثلاثاء","MT","Group","Adults",2800,"عبدالرحمن عبدالمنعم","M.T",""],["2026-11-17","الثلاثاء","MMA","Group","Adults",50,"يوسف محمد حسنى","M.M.A","استكمال"],["2026-11-17","الثلاثاء","MMA","Group","Adults",2200,"احمد علي احمد","M.M.A","خصم15% لحين الاستكمال"],["2026-11-17","الثلاثاء","MMA","Group","Adults",2800,"كريم العبد","M.M.A",""],["2026-11-17","الثلاثاء","MMA","Group","Adults",400,"محمد يسري","M.M.A",""],["2026-11-17","الثلاثاء","MMA","Group","Adults",400,"احمد مسعود","M.M.A",""],["2026-11-17","الثلاثاء","MMA","Group","Adults",2800,"عمر الطيب","M.M.A",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",2000,"ايهاب الزربا","جوجيتسو","خصم20%"],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",400,"يوسف فتيحة","جوجيتسو",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",2500,"ياسين وسام","جوجيتسو",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",400,"ياسين عمرو وردة","جوجيتسو",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",2800,"احمد شريف عجاج","جوجيتسو",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",2500,"حسن صقر","جوجيتسو",""],["2026-11-18","الاربعاء","Jiu-Jitsu","Group","Adults",400,"نور خلف","جوجيتسو",""],["2026-11-18","الاربعاء","Boxing","Group","Adults",2000,"عبدالرحمن فادى","BOXING",""],["2026-11-18","الاربعاء","Boxing","Group","Adults",2000,"عبدالرحمن اسلام عيسى","BOXING",""],["2026-11-18","الاربعاء","MMA","PT","Adults",2800,"مصطفى محمد","M.M.A.PT",""],["2026-11-18","الاربعاء","MMA","Group","Adults",2400,"محمد ايمن","M.M.A",""],["2026-11-18","الاربعاء","MT","Group","Adults",3600,"ايهاب الزربا","M.T","خصم20%"],["2026-11-18","الاربعاء","MT","Group","Kids",1800,"ياسين اسامة محمد","M.T.K",""],["2026-11-18","الاربعاء","MT","Group","Kids",300,"عمر محمد حمدى","M.T.K",""],["2026-11-18","الاربعاء","MT","Group","Kids",300,"فاروق وسام","M.T.K",""],["2026-11-19","الخميس","MT","PT","Kids",2253,"حبيبة اسلام محمد","M.T.K.PT","خصم15%"],["2026-11-19","الخميس","MT","PT","Adults",600,"سلمان الشمرى","M.T.PT",""]];
+
+    // Map raw arrays to structured objects for clean querying
+    const DATA = RAW_DATA.map((r, idx) => ({
+      id: idx + 1,
+      date: r[0],
+      day: r[1],
+      sport: r[2],
+      type: r[3],
+      age: r[4],
+      amount: Number(r[5]),
+      member: r[6],
+      rawType: r[7],
+      notes: r[8] || ''
+    }));
+
+    const ALL_SPORTS = ['Jiu-Jitsu', 'MMA', 'MT', 'Boxing', 'Aikido', 'Rugby'];
+    const ALL_DAYS = ['السبت', 'الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة'];
+    const ALL_DATES = [...new Set(DATA.map(d => d.date))].sort();
+
+    // Executive Color Palette per Sport
+    const SPORT_COLORS = {
+      'Jiu-Jitsu': '#4F46E5', // Indigo
+      'MMA':       '#10B981', // Emerald
+      'MT':        '#F59E0B', // Amber
+      'Boxing':    '#F43F5E', // Rose
+      'Aikido':    '#06B6D4', // Cyan
+      'Rugby':     '#8B5CF6', // Violet
+    };
+
+    // Tab subtitles
+    const TAB_SUBTITLES = {
+      overview: 'نظرة تنفيذية شاملة على الأداء التشغيلي والمالي',
+      sports:   'تحليل تفصيلي ومقارنة أداء الأنشطة الرياضية الستة وسجل الاشتراكات',
+      trends:   'تحليل أنماط الإقبال اليومي والأسبوعي ومصفوفة تركز الرياضات',
+      pt_kids:  'تحليل التدريب الخاص (PT) مقابل الجماعي (Group) وقطاع الأطفال (Kids - K)',
+      insights: 'التقييم الإداري، فرص النمو، التقرير التنفيذي، وتدقيق جودة البيانات'
+    };
+
+    // Global State
+    let currentTab = 'overview';
+    let filteredData = [...DATA];
+    let dailyTrendMode = 'revenue'; // 'revenue' or 'count'
+    const charts = {}; // Registry of Chart.js instances
+
+    // Chart.js Global Defaults for Arabic RTL & Cairo Font
+    Chart.defaults.font.family = "'Cairo', sans-serif";
+    Chart.defaults.color = '#475569';
+    Chart.defaults.plugins.tooltip.rtl = true;
+    Chart.defaults.plugins.tooltip.textDirection = 'rtl';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.94)';
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 10;
+    Chart.defaults.plugins.tooltip.titleFont = { family: 'Cairo', size: 13, weight: 'bold' };
+    Chart.defaults.plugins.tooltip.bodyFont = { family: 'Cairo', size: 12 };
+
+    // =========================================================================
+    // 2. FORMATTING & HELPER UTILITIES
+    // =========================================================================
+    function fmtNum(n, decimals = 0) {
+      if (n === null || n === undefined || isNaN(n)) return '0';
+      const hasFraction = Math.abs(n - Math.round(n)) > 0.001;
+      return Number(n).toLocaleString('en-US', {
+        minimumFractionDigits: hasFraction ? 1 : decimals,
+        maximumFractionDigits: hasFraction ? 1 : decimals
+      });
+    }
+
+    function fmtPct(part, total) {
+      if (!total) return '0.0%';
+      return ((part / total) * 100).toFixed(1) + '%';
+    }
+
+    function destroyChart(key) {
+      if (charts[key]) {
+        charts[key].destroy();
+        delete charts[key];
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // =========================================================================
+    // 3. NAVIGATION & SIDEBAR CONTROLS
+    // =========================================================================
+    function toggleMobileSidebar(show) {
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('mobileBackdrop');
+      if (show) {
+        sidebar.classList.remove('translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+
+      // Update sidebar active button styling
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tabId;
+        if (isActive) {
+          btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/25');
+          btn.classList.remove('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+        } else {
+          btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg', 'shadow-indigo-600/25');
+          btn.classList.add('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+        }
+      });
+
+      // Toggle tab panels
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      const activePanel = document.getElementById(`tab-${tabId}`);
+      if (activePanel) {
+        activePanel.classList.remove('hidden');
+      }
+
+      // Update subtitle
+      document.getElementById('currentTabSubtitle').textContent = TAB_SUBTITLES[tabId] || '';
+
+      // Close mobile sidebar if open
+      toggleMobileSidebar(false);
+
+      // Render charts & tables for the newly active tab
+      renderActiveTab();
+    }
+
+    // =========================================================================
+    // 4. GLOBAL INTERACTIVE CROSS-FILTERING
+    // =========================================================================
+    function populateDateDropdown() {
+      const sel = document.getElementById('filterDate');
+      ALL_DATES.forEach(dt => {
+        const dayName = DATA.find(d => d.date === dt)?.day || '';
+        const opt = document.createElement('option');
+        opt.value = dt;
+        opt.textContent = `${dt} (${dayName})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function applyFilters() {
+      const sport = document.getElementById('filterSport').value;
+      const type  = document.getElementById('filterType').value;
+      const age   = document.getElementById('filterAge').value;
+      const day   = document.getElementById('filterDay').value;
+      const date  = document.getElementById('filterDate').value;
+
+      filteredData = DATA.filter(row => {
+        if (sport !== 'ALL' && row.sport !== sport) return false;
+        if (type  !== 'ALL' && row.type  !== type)  return false;
+        if (age   !== 'ALL' && row.age   !== age)   return false;
+        if (day   !== 'ALL' && row.day   !== day)   return false;
+        if (date  !== 'ALL' && row.date  !== date)  return false;
+        return true;
+      });
+
+      // Update live filter badge
+      const count = filteredData.length;
+      document.getElementById('filteredCountText').textContent = `عرض ${count} من ${DATA.length} سجل`;
+      const emptyEl = document.getElementById('emptyState');
+      if (count === 0) {
+        emptyEl.classList.remove('hidden');
+      } else {
+        emptyEl.classList.add('hidden');
+      }
+
+      // Recalculate everything across active tab (and cached DOM metrics)
+      renderActiveTab();
+    }
+
+    function resetFilters() {
+      document.getElementById('filterSport').value = 'ALL';
+      document.getElementById('filterType').value  = 'ALL';
+      document.getElementById('filterAge').value   = 'ALL';
+      document.getElementById('filterDay').value   = 'ALL';
+      document.getElementById('filterDate').value  = 'ALL';
+      const searchEl = document.getElementById('txSearchInput');
+      if (searchEl) searchEl.value = '';
+      applyFilters();
+    }
+
+    function renderActiveTab() {
+      try {
+        if (currentTab === 'overview') renderOverviewTab();
+        else if (currentTab === 'sports') renderSportsTab();
+        else if (currentTab === 'trends') renderTrendsTab();
+        else if (currentTab === 'pt_kids') renderPtKidsTab();
+        // 'insights' is static verified audit content based on full dataset
+      } catch (err) {
+        console.error('Render error:', err);
+      }
+    }
+
+    // =========================================================================
+    // 5. AGGREGATION HELPERS
+    // =========================================================================
+    function aggregateBySport(rows) {
+      const map = {};
+      ALL_SPORTS.forEach(s => {
+        map[s] = {
+          sport: s,
+          count: 0,
+          revenue: 0,
+          members: new Set(),
+          min: Infinity,
+          max: -Infinity,
+          ptCount: 0,
+          ptRev: 0,
+          groupCount: 0,
+          groupRev: 0,
+          kidsCount: 0,
+          kidsRev: 0,
+          adultsCount: 0,
+          adultsRev: 0,
+          kidsPtCount: 0
+        };
+      });
+
+      rows.forEach(r => {
+        const s = map[r.sport];
+        if (!s) return;
+        s.count++;
+        s.revenue += r.amount;
+        s.members.add(r.member);
+        if (r.amount < s.min) s.min = r.amount;
+        if (r.amount > s.max) s.max = r.amount;
+        if (r.type === 'PT') {
+          s.ptCount++;
+          s.ptRev += r.amount;
+        } else {
+          s.groupCount++;
+          s.groupRev += r.amount;
+        }
+        if (r.age === 'Kids') {
+          s.kidsCount++;
+          s.kidsRev += r.amount;
+          if (r.type === 'PT') s.kidsPtCount++;
+        } else {
+          s.adultsCount++;
+          s.adultsRev += r.amount;
+        }
+      });
+
+      return Object.values(map).map(s => ({
+        ...s,
+        uniqueMembers: s.members.size,
+        avg: s.count ? s.revenue / s.count : 0,
+        min: s.count ? s.min : 0,
+        max: s.count ? s.max : 0
+      }));
+    }
+
+    function aggregateByDay(rows) {
+      const map = {};
+      ALL_DAYS.forEach(d => { map[d] = { day: d, count: 0, revenue: 0 }; });
+      rows.forEach(r => {
+        if (map[r.day]) {
+          map[r.day].count++;
+          map[r.day].revenue += r.amount;
+        }
+      });
+      return ALL_DAYS.map(d => map[d]);
+    }
+
+    // =========================================================================
+    // 6. TAB 1: EXECUTIVE OVERVIEW
+    // =========================================================================
+    function renderOverviewTab() {
+      const rows = filteredData;
+      const totalCount = rows.length;
+      const totalRev = rows.reduce((sum, r) => sum + r.amount, 0);
+      const uniqueMembers = new Set(rows.map(r => r.member)).size;
+      const avgTicket = totalCount ? totalRev / totalCount : 0;
+
+      const sportStats = aggregateBySport(rows);
+      const activeSports = sportStats.filter(s => s.count > 0);
+      const byCount = [...sportStats].sort((a, b) => b.count - a.count);
+      const byRev   = [...sportStats].sort((a, b) => b.revenue - a.revenue);
+
+      const dayStats = aggregateByDay(rows);
+      const topDay = [...dayStats].sort((a, b) => b.count - a.count || b.revenue - a.revenue)[0];
+
+      // Update 6 KPI Cards
+      document.getElementById('kpiTotalSubs').textContent = fmtNum(totalCount);
+      document.getElementById('kpiUniqueMembers').textContent = `${fmtNum(uniqueMembers)} مشترك فريد (حسب الاسم المسجل)`;
+      document.getElementById('kpiTotalRev').textContent = fmtNum(totalRev);
+      document.getElementById('kpiAvgTicket').textContent = fmtNum(avgTicket, 1);
+      document.getElementById('kpiSportsCount').textContent = `عبر ${activeSports.length} أنشطة رياضية نشطة`;
+
+      if (totalCount > 0) {
+        document.getElementById('kpiTopSportCount').textContent = byCount[0].sport;
+        document.getElementById('kpiTopSportCountSub').textContent = `${byCount[0].count} اشتراكاً (${fmtPct(byCount[0].count, totalCount)} من الإجمالي)`;
+
+        document.getElementById('kpiTopSportRev').textContent = byRev[0].sport;
+        document.getElementById('kpiTopSportRevSub').textContent = `${fmtNum(byRev[0].revenue)} (${fmtPct(byRev[0].revenue, totalRev)} من الإيرادات)`;
+
+        document.getElementById('kpiTopDay').textContent = topDay.day;
+        document.getElementById('kpiTopDaySub').textContent = `${topDay.count} اشتراكاً • إيراد ${fmtNum(topDay.revenue)}`;
+      } else {
+        document.getElementById('kpiTopSportCount').textContent = '—';
+        document.getElementById('kpiTopSportCountSub').textContent = 'لا توجد بيانات';
+        document.getElementById('kpiTopSportRev').textContent = '—';
+        document.getElementById('kpiTopSportRevSub').textContent = 'لا توجد بيانات';
+        document.getElementById('kpiTopDay').textContent = '—';
+        document.getElementById('kpiTopDaySub').textContent = 'لا توجد بيانات';
+      }
+
+      // Quick Executive Banner
+      const ptRows = rows.filter(r => r.type === 'PT');
+      const grpRows = rows.filter(r => r.type === 'Group');
+      const kidsRows = rows.filter(r => r.age === 'Kids');
+      const ptRev = ptRows.reduce((s, r) => s + r.amount, 0);
+      const kidsRev = kidsRows.reduce((s, r) => s + r.amount, 0);
+
+      document.getElementById('executiveBannerGrid').innerHTML = `
+        <div class="p-3.5 rounded-xl bg-white/8 border border-white/10">
+          <p class="text-slate-300 text-[11px] font-semibold">توازن الجماعي مقابل البرايفت</p>
+          <p class="mt-1 font-bold text-white">الجماعي ${grpRows.length} (${fmtPct(grpRows.length, totalCount)}) • البرايفت ${ptRows.length} (${fmtPct(ptRows.length, totalCount)})</p>
+          <p class="text-emerald-300 text-[11px] mt-1">مساهمة PT في الإيرادات: ${fmtPct(ptRev, totalRev)} (${fmtNum(ptRev)})</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-white/8 border border-white/10">
+          <p class="text-slate-300 text-[11px] font-semibold">حصة قطاع الأطفال (Kids - K)</p>
+          <p class="mt-1 font-bold text-white">${kidsRows.length} اشتراكاً (${fmtPct(kidsRows.length, totalCount)} من السجلات)</p>
+          <p class="text-amber-300 text-[11px] mt-1">إيرادات الأطفال: ${fmtNum(kidsRev)} (${fmtPct(kidsRev, totalRev)})</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-white/8 border border-white/10">
+          <p class="text-slate-300 text-[11px] font-semibold">تركز الإيرادات في الصدارة</p>
+          <p class="mt-1 font-bold text-white">${activeSports.length ? `أقوى 3 رياضات: ${byRev.slice(0, 3).filter(s => s.revenue > 0).map(s => s.sport).join('، ')}` : 'لا توجد بيانات'}</p>
+          <p class="text-indigo-300 text-[11px] mt-1">تمثل ${fmtPct(byRev.slice(0, 3).reduce((a, b) => a + b.revenue, 0), totalRev)} من إجمالي الإيرادات المصفاة</p>
+        </div>
+      `;
+
+      // Chart 1A: Revenue by Sport (Horizontal Bar)
+      destroyChart('overviewRev');
+      const ctxRev = document.getElementById('chartOverviewRev').getContext('2d');
+      charts.overviewRev = new Chart(ctxRev, {
+        type: 'bar',
+        data: {
+          labels: byRev.map(s => s.sport),
+          datasets: [{
+            label: 'إجمالي الإيرادات',
+            data: byRev.map(s => s.revenue),
+            backgroundColor: byRev.map(s => SPORT_COLORS[s.sport]),
+            borderRadius: 8,
+            barThickness: 26
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` الإيرادات: ${fmtNum(ctx.parsed.x)} (${fmtPct(ctx.parsed.x, totalRev)})`
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: { callback: v => fmtNum(v) }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { font: { weight: 'bold', size: 12 } }
+            }
+          }
+        }
+      });
+
+      // Chart 1B: Subscriptions Share by Sport (Doughnut)
+      destroyChart('overviewShare');
+      const ctxShare = document.getElementById('chartOverviewShare').getContext('2d');
+      charts.overviewShare = new Chart(ctxShare, {
+        type: 'doughnut',
+        data: {
+          labels: byCount.map(s => s.sport),
+          datasets: [{
+            data: byCount.map(s => s.count),
+            backgroundColor: byCount.map(s => SPORT_COLORS[s.sport]),
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              rtl: true,
+              labels: {
+                padding: 16,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                font: { size: 12, weight: '600' }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} اشتراكاً (${fmtPct(ctx.parsed, totalCount)})`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 7. TAB 2: SPORTS PERFORMANCE
+    // =========================================================================
+    function renderSportsTab() {
+      const rows = filteredData;
+      const totalCount = rows.length;
+      const totalRev = rows.reduce((s, r) => s + r.amount, 0);
+      const stats = aggregateBySport(rows);
+      const byCount = [...stats].sort((a, b) => b.count - a.count);
+      const byAvg   = [...stats].sort((a, b) => b.avg - a.avg);
+      const byRev   = [...stats].sort((a, b) => b.revenue - a.revenue || b.count - a.count);
+
+      // Chart 2A: Subscriptions by Sport
+      destroyChart('sportsCount');
+      charts.sportsCount = new Chart(document.getElementById('chartSportsCount').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: byCount.map(s => s.sport),
+          datasets: [{
+            label: 'عدد الاشتراكات',
+            data: byCount.map(s => s.count),
+            backgroundColor: byCount.map(s => SPORT_COLORS[s.sport]),
+            borderRadius: 8,
+            maxBarThickness: 44
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` الاشتراكات: ${ctx.parsed.y} (${fmtPct(ctx.parsed.y, totalCount)})`
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+          }
+        }
+      });
+
+      // Chart 2B: Average Ticket by Sport
+      destroyChart('sportsAvg');
+      charts.sportsAvg = new Chart(document.getElementById('chartSportsAvg').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: byAvg.map(s => s.sport),
+          datasets: [{
+            label: 'متوسط قيمة الاشتراك',
+            data: byAvg.map(s => Number(s.avg.toFixed(1))),
+            backgroundColor: byAvg.map(s => SPORT_COLORS[s.sport] + 'CC'),
+            borderColor: byAvg.map(s => SPORT_COLORS[s.sport]),
+            borderWidth: 1.5,
+            borderRadius: 8,
+            maxBarThickness: 44
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` متوسط الاشتراك: ${fmtNum(ctx.parsed.y, 1)}`
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => fmtNum(v) } },
+            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+          }
+        }
+      });
+
+      // Ranked Table
+      const tbody = document.getElementById('sportsRankTableBody');
+      tbody.innerHTML = byRev.map((s, idx) => `
+        <tr class="hover:bg-slate-50/90 transition-colors">
+          <td class="py-3.5 px-4 font-bold text-slate-400">#${idx + 1}</td>
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-2.5">
+              <span class="w-3 h-3 rounded-full shrink-0" style="background:${SPORT_COLORS[s.sport]}"></span>
+              <span class="font-bold text-slate-900">${s.sport}</span>
+            </div>
+          </td>
+          <td class="py-3.5 px-4 font-bold text-slate-800">${fmtNum(s.count)}</td>
+          <td class="py-3.5 px-4 font-semibold text-slate-600">${fmtNum(s.uniqueMembers)}</td>
+          <td class="py-3.5 px-4">
+            <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs">${fmtPct(s.count, totalCount)}</span>
+          </td>
+          <td class="py-3.5 px-4 font-extrabold text-emerald-700" dir="ltr">${fmtNum(s.revenue)}</td>
+          <td class="py-3.5 px-4">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-bold text-xs">${fmtPct(s.revenue, totalRev)}</span>
+          </td>
+          <td class="py-3.5 px-4 font-bold text-slate-800" dir="ltr">${fmtNum(s.avg, 1)}</td>
+          <td class="py-3.5 px-4 text-xs text-slate-500 font-semibold" dir="ltr">${s.count ? `${fmtNum(s.min)} — ${fmtNum(s.max)}` : '—'}</td>
+        </tr>
+      `).join('');
+
+      // Render Searchable Transactions Table
+      renderTransactionsTable();
+    }
+
+    function renderTransactionsTable() {
+      const q = (document.getElementById('txSearchInput')?.value || '').trim().toLowerCase();
+      const rows = filteredData.filter(r => {
+        if (!q) return true;
+        return r.member.toLowerCase().includes(q) ||
+               r.sport.toLowerCase().includes(q) ||
+               r.notes.toLowerCase().includes(q) ||
+               r.day.includes(q);
+      });
+
+      const tbody = document.getElementById('txTableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-semibold">لا توجد سجلات مطابقة للبحث</td></tr>`;
+      } else {
+        tbody.innerHTML = rows.map(r => `
+          <tr class="hover:bg-slate-50/90 transition-colors">
+            <td class="py-2.5 px-4 font-semibold text-slate-600 whitespace-nowrap" dir="ltr">${r.date}</td>
+            <td class="py-2.5 px-4 font-semibold text-slate-700 whitespace-nowrap">${r.day}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-900">${escapeHtml(r.member)}</td>
+            <td class="py-2.5 px-4">
+              <span class="inline-flex items-center gap-1.5 font-bold text-slate-800">
+                <span class="w-2 h-2 rounded-full" style="background:${SPORT_COLORS[r.sport]}"></span>
+                ${r.sport}
+              </span>
+            </td>
+            <td class="py-2.5 px-4">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.type === 'PT' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-50 text-indigo-700'}">
+                ${r.type === 'PT' ? 'PT خاص' : 'Group جماعي'}
+              </span>
+            </td>
+            <td class="py-2.5 px-4">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.age === 'Kids' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">
+                ${r.age === 'Kids' ? 'أطفال (K)' : 'بالغين'}
+              </span>
+            </td>
+            <td class="py-2.5 px-4 font-extrabold text-emerald-700 whitespace-nowrap" dir="ltr">${fmtNum(r.amount)}</td>
+            <td class="py-2.5 px-4 text-slate-500 font-medium">${r.notes ? `<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/60">${escapeHtml(r.notes)}</span>` : '—'}</td>
+          </tr>
+        `).join('');
+      }
+
+      const sum = rows.reduce((acc, r) => acc + r.amount, 0);
+      document.getElementById('txCountLabel').textContent = `إجمالي السجلات المعروضة: ${fmtNum(rows.length)}`;
+      document.getElementById('txSumLabel').textContent = `الإجمالي المالي: ${fmtNum(sum)}`;
+    }
+
+    // =========================================================================
+    // 8. TAB 3: SUBSCRIPTION TRENDS (DAYS & DATES)
+    // =========================================================================
+    function setDailyTrendMode(mode) {
+      dailyTrendMode = mode;
+      renderDailyTrendChart();
+    }
+
+    function renderTrendsTab() {
+      const rows = filteredData;
+      const totalCount = rows.length;
+      const totalRev = rows.reduce((s, r) => s + r.amount, 0);
+      const dayStats = aggregateByDay(rows);
+
+      // Chart 3A: Subscriptions by Day of Week
+      destroyChart('daysCount');
+      charts.daysCount = new Chart(document.getElementById('chartDaysCount').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: dayStats.map(d => d.day === 'الجمعة' ? 'الجمعة*' : d.day),
+          datasets: [{
+            label: 'عدد الاشتراكات',
+            data: dayStats.map(d => d.count),
+            backgroundColor: dayStats.map(d => d.day === 'الجمعة' ? '#94A3B8' : '#4F46E5'),
+            borderRadius: 8,
+            maxBarThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` الاشتراكات: ${ctx.parsed.y} (${fmtPct(ctx.parsed.y, totalCount)})`
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+          }
+        }
+      });
+
+      // Chart 3B: Revenue by Day of Week
+      destroyChart('daysRev');
+      charts.daysRev = new Chart(document.getElementById('chartDaysRev').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: dayStats.map(d => d.day === 'الجمعة' ? 'الجمعة*' : d.day),
+          datasets: [{
+            label: 'الإيرادات',
+            data: dayStats.map(d => d.revenue),
+            backgroundColor: dayStats.map(d => d.day === 'الجمعة' ? '#94A3B8' : '#10B981'),
+            borderRadius: 8,
+            maxBarThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` الإيرادات: ${fmtNum(ctx.parsed.y)} (${fmtPct(ctx.parsed.y, totalRev)})`
+              }
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { callback: v => fmtNum(v) } },
+            x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+          }
+        }
+      });
+
+      // Chart 3C: Daily Trend Line Chart
+      renderDailyTrendChart();
+
+      // Matrix Table: Sport × Day of Week
+      const matrix = {};
+      let maxCell = 1;
+      ALL_SPORTS.forEach(s => {
+        matrix[s] = { total: 0 };
+        ALL_DAYS.forEach(d => { matrix[s][d] = 0; });
+      });
+
+      rows.forEach(r => {
+        matrix[r.sport][r.day]++;
+        matrix[r.sport].total++;
+        if (matrix[r.sport][r.day] > maxCell) maxCell = matrix[r.sport][r.day];
+      });
+
+      const tbody = document.getElementById('matrixTableBody');
+      tbody.innerHTML = ALL_SPORTS.map(sport => {
+        const cells = ALL_DAYS.map(day => {
+          const val = matrix[sport][day];
+          if (val === 0) {
+            return `<td class="py-3 px-2 text-slate-300 font-medium">—</td>`;
+          }
+          const ratio = val / maxCell;
+          let bgClass = 'bg-indigo-50 text-indigo-700';
+          if (ratio >= 0.7) bgClass = 'bg-indigo-600 text-white shadow-xs';
+          else if (ratio >= 0.4) bgClass = 'bg-indigo-300 text-indigo-950';
+          else if (ratio >= 0.2) bgClass = 'bg-indigo-100 text-indigo-800';
+          return `<td class="py-2.5 px-2"><span class="inline-flex items-center justify-center w-9 h-8 rounded-lg font-bold text-xs ${bgClass}">${val}</span></td>`;
+        }).join('');
+
+        return `
+          <tr class="hover:bg-slate-50/70">
+            <td class="py-3 px-4 text-right font-bold text-slate-900">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full" style="background:${SPORT_COLORS[sport]}"></span>
+                <span>${sport}</span>
+              </div>
+            </td>
+            ${cells}
+            <td class="py-3 px-4 font-extrabold text-slate-900 bg-slate-50">${matrix[sport].total}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderDailyTrendChart() {
+      // Update toggle button styles
+      const btnRev = document.getElementById('btnTrendRev');
+      const btnCnt = document.getElementById('btnTrendCount');
+      if (dailyTrendMode === 'revenue') {
+        btnRev.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-700 shadow-xs cursor-pointer';
+        btnCnt.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer';
+      } else {
+        btnCnt.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-700 shadow-xs cursor-pointer';
+        btnRev.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer';
+      }
+
+      const dateMap = {};
+      ALL_DATES.forEach(dt => {
+        const dayName = DATA.find(d => d.date === dt)?.day || '';
+        dateMap[dt] = { label: `${dt.slice(5)} (${dayName})`, count: 0, revenue: 0 };
+      });
+
+      filteredData.forEach(r => {
+        if (dateMap[r.date]) {
+          dateMap[r.date].count++;
+          dateMap[r.date].revenue += r.amount;
+        }
+      });
+
+      const labels = ALL_DATES.map(dt => dateMap[dt].label);
+      const values = ALL_DATES.map(dt => dailyTrendMode === 'revenue' ? dateMap[dt].revenue : dateMap[dt].count);
+      const isRev = dailyTrendMode === 'revenue';
+
+      destroyChart('dailyTrend');
+      charts.dailyTrend = new Chart(document.getElementById('chartDailyTrend').getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: isRev ? 'الإيرادات اليومية' : 'عدد الاشتراكات اليومية',
+            data: values,
+            borderColor: isRev ? '#10B981' : '#4F46E5',
+            backgroundColor: isRev ? 'rgba(16, 185, 129, 0.12)' : 'rgba(79, 70, 229, 0.12)',
+            borderWidth: 3,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: isRev ? '#10B981' : '#4F46E5',
+            pointBorderWidth: 2.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: true,
+            tension: 0.32
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => isRev ? ` الإيرادات: ${fmtNum(ctx.parsed.y)}` : ` الاشتراكات: ${ctx.parsed.y}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#f1f5f9' },
+              ticks: { callback: v => fmtNum(v), precision: isRev ? undefined : 0 }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { font: { size: 11, weight: '600' } }
+            }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 9. TAB 4: PT VS GROUP & KIDS (K)
+    // =========================================================================
+    function renderPtKidsTab() {
+      const rows = filteredData;
+      const totalCount = rows.length;
+      const stats = aggregateBySport(rows);
+
+      const ptRows   = rows.filter(r => r.type === 'PT');
+      const grpRows  = rows.filter(r => r.type === 'Group');
+      const kidsRows = rows.filter(r => r.age === 'Kids');
+      const kidsPtCount = kidsRows.filter(r => r.type === 'PT').length;
+
+      const ptRev   = ptRows.reduce((s, r) => s + r.amount, 0);
+      const grpRev  = grpRows.reduce((s, r) => s + r.amount, 0);
+      const kidsRev = kidsRows.reduce((s, r) => s + r.amount, 0);
+
+      // Update Top 3 KPI Cards
+      document.getElementById('kpiGroupCount').textContent = fmtNum(grpRows.length);
+      document.getElementById('kpiGroupPct').textContent   = fmtPct(grpRows.length, totalCount);
+      document.getElementById('kpiGroupRev').textContent   = fmtNum(grpRev);
+      document.getElementById('kpiGroupAvg').textContent   = `متوسط الاشتراك: ${fmtNum(grpRows.length ? grpRev / grpRows.length : 0, 1)}`;
+
+      document.getElementById('kpiPtCount').textContent = fmtNum(ptRows.length);
+      document.getElementById('kpiPtPct').textContent   = fmtPct(ptRows.length, totalCount);
+      document.getElementById('kpiPtRev').textContent   = fmtNum(ptRev);
+      document.getElementById('kpiPtAvg').textContent   = `متوسط الاشتراك: ${fmtNum(ptRows.length ? ptRev / ptRows.length : 0, 1)}`;
+
+      document.getElementById('kpiKidsCount').textContent   = fmtNum(kidsRows.length);
+      document.getElementById('kpiKidsPct').textContent     = fmtPct(kidsRows.length, totalCount);
+      document.getElementById('kpiKidsRev').textContent     = fmtNum(kidsRev);
+      document.getElementById('kpiKidsOverlap').textContent = `يشمل ${kidsPtCount} سجلات K+PT (تُحتسب مرة واحدة دون ازدواجية)`;
+
+      // Chart 4A: Stacked Bar Chart PT vs Group per Sport
+      destroyChart('ptVsGroup');
+      charts.ptVsGroup = new Chart(document.getElementById('chartPtVsGroup').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: stats.map(s => s.sport),
+          datasets: [
+            {
+              label: 'جماعي (Group)',
+              data: stats.map(s => s.groupCount),
+              backgroundColor: '#4F46E5',
+              borderRadius: 6,
+              maxBarThickness: 46
+            },
+            {
+              label: 'تدريب خاص (PT)',
+              data: stats.map(s => s.ptCount),
+              backgroundColor: '#F59E0B',
+              borderRadius: 6,
+              maxBarThickness: 46
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              rtl: true,
+              labels: { usePointStyle: true, pointStyle: 'circle', font: { weight: 'bold' } }
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { weight: 'bold' } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } }
+          }
+        }
+      });
+
+      // PT vs Group Table
+      const ptTbody = document.getElementById('ptGroupTableBody');
+      ptTbody.innerHTML = stats.map(s => {
+        let dominant = '—';
+        if (s.count > 0) {
+          if (s.ptCount > s.groupCount) dominant = '<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">تدريب خاص (PT)</span>';
+          else if (s.groupCount > s.ptCount) dominant = '<span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold">جماعي (Group)</span>';
+          else dominant = '<span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">متساوي</span>';
+        }
+        return `
+          <tr class="hover:bg-slate-50/90">
+            <td class="py-3.5 px-4 font-bold text-slate-900">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full" style="background:${SPORT_COLORS[s.sport]}"></span>
+                <span>${s.sport}</span>
+              </div>
+            </td>
+            <td class="py-3.5 px-4 font-bold">${s.count}</td>
+            <td class="py-3.5 px-4 font-bold text-amber-700">${s.ptCount}</td>
+            <td class="py-3.5 px-4 font-bold text-indigo-700">${s.groupCount}</td>
+            <td class="py-3.5 px-4 text-xs font-bold text-amber-700">${fmtPct(s.ptCount, s.count)}</td>
+            <td class="py-3.5 px-4 text-xs font-bold text-indigo-700">${fmtPct(s.groupCount, s.count)}</td>
+            <td class="py-3.5 px-4 font-bold text-emerald-700" dir="ltr">${fmtNum(s.ptRev)}</td>
+            <td class="py-3.5 px-4 font-bold text-slate-700" dir="ltr">${fmtNum(s.groupRev)}</td>
+            <td class="py-3.5 px-4">${dominant}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Chart 4B: Kids vs Adults per Sport
+      destroyChart('kidsVsAdults');
+      charts.kidsVsAdults = new Chart(document.getElementById('chartKidsVsAdults').getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: stats.map(s => s.sport),
+          datasets: [
+            {
+              label: 'بالغين (Adults)',
+              data: stats.map(s => s.adultsCount),
+              backgroundColor: '#334155',
+              borderRadius: 6,
+              maxBarThickness: 36
+            },
+            {
+              label: 'أطفال (Kids - K)',
+              data: stats.map(s => s.kidsCount),
+              backgroundColor: '#F43F5E',
+              borderRadius: 6,
+              maxBarThickness: 36
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              rtl: true,
+              labels: { usePointStyle: true, pointStyle: 'circle', font: { weight: 'bold' } }
+            }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { font: { weight: 'bold' } } },
+            y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { precision: 0 } }
+          }
+        }
+      });
+
+      // Kids Table
+      const kidsTbody = document.getElementById('kidsTableBody');
+      kidsTbody.innerHTML = stats.map(s => `
+        <tr class="hover:bg-slate-50/90 ${s.kidsCount > 0 ? 'bg-rose-50/30' : ''}">
+          <td class="py-3 px-4 font-bold text-slate-900">${s.sport}</td>
+          <td class="py-3 px-4 font-bold">${s.count}</td>
+          <td class="py-3 px-4 font-semibold text-slate-600">${s.adultsCount}</td>
+          <td class="py-3 px-4 font-extrabold ${s.kidsCount > 0 ? 'text-rose-600' : 'text-slate-400'}">${s.kidsCount}</td>
+          <td class="py-3 px-4 font-bold text-xs ${s.kidsCount > 0 ? 'text-rose-700' : 'text-slate-400'}">${fmtPct(s.kidsCount, s.count)}</td>
+          <td class="py-3 px-4 font-bold text-amber-700">${s.kidsPtCount}</td>
+          <td class="py-3 px-4 font-bold text-emerald-700" dir="ltr">${fmtNum(s.kidsRev)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // =========================================================================
+    // 10. INITIALIZATION
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      populateDateDropdown();
+      switchTab('overview');
+    });
+  </script>
+</body>
+</html>
