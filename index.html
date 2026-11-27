@@ -263,10 +263,56 @@
               <select id="filterDay" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"></select>
             </div>
 
-            <!-- 5. Date -->
-            <div class="col-span-2 sm:col-span-1">
-              <label id="lblFilterDate" for="filterDate" class="block text-[11px] font-bold text-slate-500 mb-1">التاريخ</label>
-              <select id="filterDate" onchange="applyFilters()" class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition"></select>
+            <!-- 5. Smart Calendar Date Range Picker -->
+            <div id="datePickerWrapper" class="relative col-span-2 sm:col-span-1">
+              <label id="lblFilterDate" class="block text-[11px] font-bold text-slate-500 mb-1">النطاق الزمني (التقويم)</label>
+              <button id="dateRangeTrigger" type="button" onclick="toggleDatePopover()" class="w-full flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 px-3 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition cursor-pointer">
+                <span class="flex items-center gap-1.5 truncate">
+                  <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                  </svg>
+                  <span id="dateRangeLabel" class="truncate">كل التواريخ (19 يوم)</span>
+                </span>
+                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+
+              <!-- Interactive Calendar Popover -->
+              <div id="dateRangePopover" onclick="event.stopPropagation()" class="hidden absolute top-full mt-2 end-0 z-50 w-[310px] sm:w-[330px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 space-y-3">
+                <!-- Single-Click All Days Action -->
+                <div id="datePresetsRow" class="flex pb-2.5 border-b border-slate-100"></div>
+
+                <!-- Month Header & Live Selection Hint -->
+                <div class="flex items-center justify-between">
+                  <h4 id="calMonthTitle" class="text-sm font-extrabold text-slate-900">نوفمبر 2026</h4>
+                  <span id="calSelectionHint" class="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md"></span>
+                </div>
+
+                <!-- Weekday Headers -->
+                <div id="calWeekdaysRow" class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400"></div>
+
+                <!-- Days Grid -->
+                <div id="calDaysGrid" class="grid grid-cols-7 gap-1 text-center"></div>
+
+                <!-- Selected Range Summary & Actions -->
+                <div class="pt-2.5 border-t border-slate-100 space-y-2.5">
+                  <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                      <span id="calFromLbl" class="block text-slate-400 font-semibold">من:</span>
+                      <span id="calFromVal" class="font-extrabold text-slate-800" dir="ltr">—</span>
+                    </div>
+                    <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200/70">
+                      <span id="calToLbl" class="block text-slate-400 font-semibold">إلى:</span>
+                      <span id="calToVal" class="font-extrabold text-slate-800" dir="ltr">—</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between gap-2">
+                    <button id="calClearBtn" type="button" onclick="clearDateRange()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer">مسح التحديد</button>
+                    <button id="calDoneBtn" type="button" onclick="applyCalendarDone()" class="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer">تم</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -781,6 +827,13 @@
     const ALL_DAYS   = ['السبت', 'الاحد', 'الاثنين', 'الثلاثاء', 'الاربعاء', 'الخميس', 'الجمعة'];
     const ALL_DATES  = [...new Set(DATA.map(d => d.date))].sort();
 
+    // Weekly ranges (Saturday – Friday) for the Date / Week filter
+    const WEEKS = [
+      { id: 'WEEK_1', start: '2026-11-07', end: '2026-11-13', ar: 'الأسبوع الأول (7 – 13 نوفمبر)',  en: 'Week 1 (Nov 7 – 13)' },
+      { id: 'WEEK_2', start: '2026-11-14', end: '2026-11-20', ar: 'الأسبوع الثاني (14 – 19 نوفمبر)', en: 'Week 2 (Nov 14 – 19)' },
+      { id: 'WEEK_3', start: '2026-11-21', end: '2026-11-27', ar: 'الأسبوع الثالث (21 – 26 نوفمبر)', en: 'Week 3 (Nov 21 – 26)' }
+    ];
+
     // Executive Color Palette per Sport (Exact match to original)
     const SPORT_COLORS = {
       'BJJ':    '#4F46E5', // Indigo
@@ -863,11 +916,21 @@
         filteredCount: (c, t) => `عرض ${c} من ${t} سجل`,
         btnReset: 'إعادة تعيين الفلاتر',
         filters: {
-          sport: 'الرياضة', type: 'نوع التدريب', age: 'الفئة العمرية', day: 'يوم الأسبوع', date: 'التاريخ',
+          sport: 'الرياضة', type: 'نوع التدريب', age: 'الفئة العمرية', day: 'يوم الأسبوع', date: 'النطاق الزمني (التقويم)',
           allSports: 'الكل (6 رياضات)', allTypes: 'الكل (Group + PT)',
           typeGroup: 'جروبات (Group)', typePT: 'تدريب خاص (PT)',
           allAges: 'الكل (بالغين + أطفال)', ageAdults: 'بالغين', ageKids: 'أطفال (K)',
-          allDays: 'كل أيام الأسبوع', allDates: `كل التواريخ (${ALL_DATES.length} يوم)`
+          allDays: 'كل أيام الأسبوع', allDates: `كل التواريخ (${ALL_DATES.length} يوم)`,
+          calMonth: 'نوفمبر 2026',
+          calWeekdays: ['سبت', 'أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع'],
+          calHintStart: 'اختر يوم البداية',
+          calHintEnd: 'اختر يوم النهاية',
+          calHintReady: 'تم تحديد النطاق',
+          calFrom: 'من:',
+          calTo: 'إلى:',
+          calClear: 'مسح التحديد',
+          calDone: 'تم',
+          presetAll: 'جميع الأيام (كل التواريخ)'
         },
         emptyTitle: 'لا توجد بيانات مطابقة للفلاتر المحددة',
         emptySub: 'يرجى تعديل اختيارات التصفية أو الضغط على زر إعادة تعيين الفلاتر لعرض جميع السجلات.',
@@ -1000,11 +1063,21 @@
         filteredCount: (c, t) => `Showing ${c} of ${t} records`,
         btnReset: 'Reset Filters',
         filters: {
-          sport: 'Sport', type: 'Training Type', age: 'Age Group', day: 'Day of Week', date: 'Date',
+          sport: 'Sport', type: 'Training Type', age: 'Age Group', day: 'Day of Week', date: 'Date Range (Calendar)',
           allSports: 'All (6 Sports)', allTypes: 'All (Group + PT)',
           typeGroup: 'Group Training', typePT: 'Personal Training (PT)',
           allAges: 'All (Adults + Kids)', ageAdults: 'Adults', ageKids: 'Kids (K)',
-          allDays: 'All Weekdays', allDates: `All Dates (${ALL_DATES.length} Days)`
+          allDays: 'All Weekdays', allDates: `All Dates (${ALL_DATES.length} Days)`,
+          calMonth: 'November 2026',
+          calWeekdays: ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'],
+          calHintStart: 'Pick start date',
+          calHintEnd: 'Pick end date',
+          calHintReady: 'Range active',
+          calFrom: 'From:',
+          calTo: 'To:',
+          calClear: 'Clear',
+          calDone: 'Done',
+          presetAll: 'All Days (All Dates)'
         },
         emptyTitle: 'No records match the selected filters',
         emptySub: 'Please adjust your filter criteria or click Reset Filters to view all records.',
@@ -1119,12 +1192,22 @@
     let dailyTrendMode = 'revenue';
     let txSortKey = 'date';
     let txSortAsc = true;
+    let dateRangeStart = null;
+    let dateRangeEnd = null;
+    let draftStart = null;
+    let draftEnd = null;
+    let hoverDate = null;
+    const ACTIVE_DATES_SET = new Set(ALL_DATES);
     const charts = {};
 
-    const t = () => I18N[currentLang];
-    const sportLabel = k => SPORT_LABELS[currentLang][k] || k;
-    const dayLabel = d => DAY_LABELS[currentLang][d] || d;
-    const noteLabel = n => (!n ? '' : (currentLang === 'en' ? (NOTE_LABELS_EN[n] || n) : n));
+    function t() { return I18N[currentLang]; }
+    function sportLabel(key) { return (SPORT_LABELS[currentLang] && SPORT_LABELS[currentLang][key]) || key; }
+    function dayLabel(key) { return (DAY_LABELS[currentLang] && DAY_LABELS[currentLang][key]) || key; }
+    function noteLabel(str) {
+      if (!str) return '';
+      if (currentLang === 'ar') return str;
+      return NOTE_LABELS_EN[str] || str;
+    }
 
     function fmtNum(n, decimals = 0) {
       if (n === null || n === undefined || isNaN(n)) return '0';
@@ -1161,51 +1244,52 @@
 
     function applyChartDefaults() {
       const isAr = currentLang === 'ar';
-      Chart.defaults.font.family = isAr ? "'Cairo', sans-serif" : "'Inter', sans-serif";
+      const fontName = isAr ? 'Cairo' : 'Inter';
+      Chart.defaults.font.family = `'${fontName}', sans-serif`;
       Chart.defaults.color = '#475569';
       Chart.defaults.plugins.tooltip.rtl = isAr;
       Chart.defaults.plugins.tooltip.textDirection = isAr ? 'rtl' : 'ltr';
       Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.94)';
       Chart.defaults.plugins.tooltip.padding = 12;
       Chart.defaults.plugins.tooltip.cornerRadius = 10;
-      Chart.defaults.plugins.tooltip.titleFont = { family: isAr ? 'Cairo' : 'Inter', size: 13, weight: 'bold' };
-      Chart.defaults.plugins.tooltip.bodyFont = { family: isAr ? 'Cairo' : 'Inter', size: 12 };
+      Chart.defaults.plugins.tooltip.titleFont = { family: fontName, size: 13, weight: 'bold' };
+      Chart.defaults.plugins.tooltip.bodyFont = { family: fontName, size: 12 };
     }
 
     // =========================================================================
-    // 4. SIDEBAR, NAVIGATION & LANGUAGE TOGGLE
+    // 4. BILINGUAL SWITCHING, STATIC UI & NAVIGATION
     // =========================================================================
-    function updateSidebarPositionClasses() {
-      const sidebar = document.getElementById('sidebar');
-      const isAr = currentLang === 'ar';
-      // Ensure mobile slide-over direction matches RTL vs LTR cleanly
-      sidebar.classList.remove('right-0', 'left-0', 'translate-x-full', '-translate-x-full');
-      if (isAr) {
-        sidebar.classList.add('right-0', 'translate-x-full');
-      } else {
-        sidebar.classList.add('left-0', '-translate-x-full');
-      }
-      document.getElementById('mobileBackdrop').classList.add('hidden');
-    }
-
     function toggleMobileSidebar(show) {
       const sidebar = document.getElementById('sidebar');
       const backdrop = document.getElementById('mobileBackdrop');
-      const hideClass = currentLang === 'ar' ? 'translate-x-full' : '-translate-x-full';
+      const isAr = currentLang === 'ar';
+      const hiddenCls = isAr ? 'translate-x-full' : '-translate-x-full';
       if (show) {
-        sidebar.classList.remove(hideClass);
+        sidebar.classList.remove('translate-x-full', '-translate-x-full');
         backdrop.classList.remove('hidden');
       } else {
-        sidebar.classList.add(hideClass);
+        sidebar.classList.remove('translate-x-full', '-translate-x-full');
+        sidebar.classList.add(hiddenCls);
         backdrop.classList.add('hidden');
       }
     }
 
     function toggleLanguage() {
       currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      const isAr = currentLang === 'ar';
       document.documentElement.lang = currentLang;
-      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-      updateSidebarPositionClasses();
+      document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+
+      // Adjust sidebar mobile drawer side for RTL vs LTR
+      const sidebar = document.getElementById('sidebar');
+      if (isAr) {
+        sidebar.classList.remove('left-0', '-translate-x-full');
+        sidebar.classList.add('right-0', 'translate-x-full');
+      } else {
+        sidebar.classList.remove('right-0', 'translate-x-full');
+        sidebar.classList.add('left-0', '-translate-x-full');
+      }
+
       applyChartDefaults();
       renderStaticUI();
       populateFilters(true);
@@ -1215,100 +1299,107 @@
 
     function renderStaticUI() {
       const L = t();
-      document.getElementById('sidebarBrandTitle').textContent = L.sidebarBrandTitle;
-      document.getElementById('sidebarBrandSub').textContent = L.sidebarBrandSub;
-      document.getElementById('sidebarNavLabel').textContent = L.sidebarNavLabel;
-      document.getElementById('navTextOverview').textContent = L.nav.overview;
-      document.getElementById('navTextSports').textContent = L.nav.sports;
-      document.getElementById('navTextTrends').textContent = L.nav.trends;
-      document.getElementById('navTextPtKids').textContent = L.nav.pt_kids;
-      document.getElementById('navTextInsights').textContent = L.nav.insights;
-      document.getElementById('sidebarMetaRangeLbl').textContent = L.sidebarMetaRangeLbl;
-      document.getElementById('sidebarMetaSourceLbl').textContent = L.sidebarMetaSourceLbl;
-      document.getElementById('sidebarMetaSourceVal').textContent = L.sidebarMetaSourceVal;
-      document.getElementById('sidebarMetaVerified').textContent = L.sidebarMetaVerified;
+      const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
 
-      document.getElementById('headerMainTitle').textContent = L.headerMainTitle;
-      document.getElementById('currentTabSubtitle').textContent = L.subtitles[currentTab] || '';
-      document.getElementById('btnResetLabel').textContent = L.btnReset;
-      document.getElementById('btnPrintLabel').textContent = L.btnPrint;
-      document.getElementById('langToggleLabel').textContent = L.langToggle;
+      // Sidebar & Header
+      setText('sidebarBrandTitle', L.sidebarBrandTitle);
+      setText('sidebarBrandSub', L.sidebarBrandSub);
+      setText('sidebarNavLabel', L.sidebarNavLabel);
+      setText('navTextOverview', L.nav.overview);
+      setText('navTextSports', L.nav.sports);
+      setText('navTextTrends', L.nav.trends);
+      setText('navTextPtKids', L.nav.pt_kids);
+      setText('navTextInsights', L.nav.insights);
+      setText('sidebarMetaRangeLbl', L.sidebarMetaRangeLbl);
+      setText('sidebarMetaSourceLbl', L.sidebarMetaSourceLbl);
+      setText('sidebarMetaSourceVal', L.sidebarMetaSourceVal);
+      setText('sidebarMetaVerified', L.sidebarMetaVerified);
+      setText('headerMainTitle', L.headerMainTitle);
+      setText('currentTabSubtitle', L.subtitles[currentTab] || '');
+      setText('btnResetLabel', L.btnReset);
+      setText('btnPrintLabel', L.btnPrint);
+      setText('langToggleLabel', L.langToggle);
 
-      document.getElementById('lblFilterSport').textContent = L.filters.sport;
-      document.getElementById('lblFilterType').textContent = L.filters.type;
-      document.getElementById('lblFilterAge').textContent = L.filters.age;
-      document.getElementById('lblFilterDay').textContent = L.filters.day;
-      document.getElementById('lblFilterDate').textContent = L.filters.date;
+      // Filter Labels
+      setText('lblFilterSport', L.filters.sport);
+      setText('lblFilterType', L.filters.type);
+      setText('lblFilterAge', L.filters.age);
+      setText('lblFilterDay', L.filters.day);
+      setText('lblFilterDate', L.filters.date);
 
-      document.getElementById('emptyStateTitle').textContent = L.emptyTitle;
-      document.getElementById('emptyStateSub').textContent = L.emptySub;
+      // Empty State
+      setText('emptyStateTitle', L.emptyTitle);
+      setText('emptyStateSub', L.emptySub);
 
-      // Overview static labels
-      document.getElementById('kpiLblTotalSubs').textContent = L.overview.kpiTotalSubs;
-      document.getElementById('kpiLblTotalRev').textContent = L.overview.kpiTotalRev;
-      document.getElementById('kpiRevSub').textContent = L.overview.kpiRevSub;
-      document.getElementById('kpiLblAvgTicket').textContent = L.overview.kpiAvgTicket;
-      document.getElementById('kpiLblTopSportCount').textContent = L.overview.kpiTopSportCount;
-      document.getElementById('kpiLblTopSportRev').textContent = L.overview.kpiTopSportRev;
-      document.getElementById('kpiLblTopDay').textContent = L.overview.kpiTopDay;
-      document.getElementById('ovChartRevTitle').textContent = L.overview.chartRevTitle;
-      document.getElementById('ovChartRevSub').textContent = L.overview.chartRevSub;
-      document.getElementById('ovChartRevBadge').textContent = L.overview.chartRevBadge;
-      document.getElementById('ovChartShareTitle').textContent = L.overview.chartShareTitle;
-      document.getElementById('ovChartShareSub').textContent = L.overview.chartShareSub;
-      document.getElementById('ovChartShareBadge').textContent = L.overview.chartShareBadge;
-      document.getElementById('ovBannerTitle').textContent = L.overview.bannerTitle;
-      document.getElementById('ovBannerSub').textContent = L.overview.bannerSub;
-      document.getElementById('ovBannerBtn').textContent = L.overview.bannerBtn;
+      // Tab 1 Overview Labels
+      setText('kpiLblTotalSubs', L.overview.kpiTotalSubs);
+      setText('kpiLblTotalRev', L.overview.kpiTotalRev);
+      setText('kpiRevSub', L.overview.kpiRevSub);
+      setText('kpiLblAvgTicket', L.overview.kpiAvgTicket);
+      setText('kpiLblTopSportCount', L.overview.kpiTopSportCount);
+      setText('kpiLblTopSportRev', L.overview.kpiTopSportRev);
+      setText('kpiLblTopDay', L.overview.kpiTopDay);
+      setText('ovChartRevTitle', L.overview.chartRevTitle);
+      setText('ovChartRevSub', L.overview.chartRevSub);
+      setText('ovChartRevBadge', L.overview.chartRevBadge);
+      setText('ovChartShareTitle', L.overview.chartShareTitle);
+      setText('ovChartShareSub', L.overview.chartShareSub);
+      setText('ovChartShareBadge', L.overview.chartShareBadge);
+      setText('ovBannerTitle', L.overview.bannerTitle);
+      setText('ovBannerSub', L.overview.bannerSub);
+      setText('ovBannerBtn', L.overview.bannerBtn);
 
-      // Sports static labels
-      document.getElementById('spChartCountTitle').textContent = L.sports.chartCountTitle;
-      document.getElementById('spChartCountSub').textContent = L.sports.chartCountSub;
-      document.getElementById('spChartAvgTitle').textContent = L.sports.chartAvgTitle;
-      document.getElementById('spChartAvgSub').textContent = L.sports.chartAvgSub;
-      document.getElementById('spTableTitle').textContent = L.sports.tableTitle;
-      document.getElementById('spTableSub').textContent = L.sports.tableSub;
-      document.getElementById('spNoReceiptBadge').textContent = L.sports.noReceipt;
-      document.getElementById('txTableTitle').textContent = L.sports.txTitle;
-      document.getElementById('txTableSub').textContent = L.sports.txSub;
-      document.getElementById('txSearchInput').placeholder = L.sports.searchPlaceholder;
+      // Tab 2 Sports Labels
+      setText('spChartCountTitle', L.sports.chartCountTitle);
+      setText('spChartCountSub', L.sports.chartCountSub);
+      setText('spChartAvgTitle', L.sports.chartAvgTitle);
+      setText('spChartAvgSub', L.sports.chartAvgSub);
+      setText('spTableTitle', L.sports.tableTitle);
+      setText('spTableSub', L.sports.tableSub);
+      setText('spNoReceiptBadge', L.sports.noReceipt);
+      setText('txTableTitle', L.sports.txTitle);
+      setText('txTableSub', L.sports.txSub);
+      const searchEl = document.getElementById('txSearchInput');
+      if (searchEl) searchEl.placeholder = L.sports.searchPlaceholder;
 
-      // Trends static labels
-      document.getElementById('trendsNoteText').innerHTML = L.trends.note;
-      document.getElementById('trDaysCountTitle').textContent = L.trends.daysCountTitle;
-      document.getElementById('trDaysCountSub').textContent = L.trends.daysCountSub;
-      document.getElementById('trDaysRevTitle').textContent = L.trends.daysRevTitle;
-      document.getElementById('trDaysRevSub').textContent = L.trends.daysRevSub;
-      document.getElementById('trDailyTitle').textContent = L.trends.dailyTitle;
-      document.getElementById('trDailySub').textContent = L.trends.dailySub;
-      document.getElementById('btnTrendRev').textContent = L.trends.btnRev;
-      document.getElementById('btnTrendCount').textContent = L.trends.btnCount;
-      document.getElementById('trMatrixTitle').textContent = L.trends.matrixTitle;
-      document.getElementById('trMatrixSub').textContent = L.trends.matrixSub;
+      // Tab 3 Trends Labels
+      setHtml('trendsNoteText', L.trends.note);
+      setText('trDaysCountTitle', L.trends.daysCountTitle);
+      setText('trDaysCountSub', L.trends.daysCountSub);
+      setText('trDaysRevTitle', L.trends.daysRevTitle);
+      setText('trDaysRevSub', L.trends.daysRevSub);
+      setText('trDailyTitle', L.trends.dailyTitle);
+      setText('trDailySub', L.trends.dailySub);
+      setText('btnTrendRev', L.trends.btnRev);
+      setText('btnTrendCount', L.trends.btnCount);
+      setText('trMatrixTitle', L.trends.matrixTitle);
+      setText('trMatrixSub', L.trends.matrixSub);
 
-      // PT & Kids static labels
-      document.getElementById('ptKpiGrpTitle').textContent = L.ptKids.grpTitle;
-      document.getElementById('ptKpiGrpCountLbl').textContent = L.ptKids.countLbl;
-      document.getElementById('ptKpiGrpRevLbl').textContent = L.ptKids.revLbl;
-      document.getElementById('ptKpiPtTitle').textContent = L.ptKids.ptTitle;
-      document.getElementById('ptKpiPtCountLbl').textContent = L.ptKids.countLbl;
-      document.getElementById('ptKpiPtRevLbl').textContent = L.ptKids.revLbl;
-      document.getElementById('ptKpiKidsTitle').textContent = L.ptKids.kidsTitle;
-      document.getElementById('ptKpiKidsCountLbl').textContent = L.ptKids.kidsCountLbl;
-      document.getElementById('ptKpiKidsRevLbl').textContent = L.ptKids.kidsRevLbl;
-      document.getElementById('ptChartTitle').textContent = L.ptKids.chartTitle;
-      document.getElementById('ptChartSub').textContent = L.ptKids.chartSub;
-      document.getElementById('ptTableTitle').textContent = L.ptKids.tableTitle;
-      document.getElementById('ptTableSub').textContent = L.ptKids.tableSub;
-      document.getElementById('kidsChartTitle').textContent = L.ptKids.kidsChartTitle;
-      document.getElementById('kidsChartSub').textContent = L.ptKids.kidsChartSub;
-      document.getElementById('kidsTableTitle').textContent = L.ptKids.kidsTableTitle;
-      document.getElementById('kidsTableSub').textContent = L.ptKids.kidsTableSub;
-      document.getElementById('kidsRuleBanner').innerHTML = L.ptKids.kidsRule;
+      // Tab 4 PT & Kids Labels
+      setText('ptKpiGrpTitle', L.ptKids.grpTitle);
+      setText('ptKpiGrpCountLbl', L.ptKids.countLbl);
+      setText('ptKpiGrpRevLbl', L.ptKids.revLbl);
+      setText('ptKpiPtTitle', L.ptKids.ptTitle);
+      setText('ptKpiPtCountLbl', L.ptKids.countLbl);
+      setText('ptKpiPtRevLbl', L.ptKids.revLbl);
+      setText('ptKpiKidsTitle', L.ptKids.kidsTitle);
+      setText('ptKpiKidsCountLbl', L.ptKids.kidsCountLbl);
+      setText('ptKpiKidsRevLbl', L.ptKids.kidsRevLbl);
+      setText('ptChartTitle', L.ptKids.chartTitle);
+      setText('ptChartSub', L.ptKids.chartSub);
+      setText('ptTableTitle', L.ptKids.tableTitle);
+      setText('ptTableSub', L.ptKids.tableSub);
+      setText('kidsChartTitle', L.ptKids.kidsChartTitle);
+      setText('kidsChartSub', L.ptKids.kidsChartSub);
+      setText('kidsTableTitle', L.ptKids.kidsTableTitle);
+      setText('kidsTableSub', L.ptKids.kidsTableSub);
+      setHtml('kidsRuleBanner', L.ptKids.kidsRule);
     }
 
     function switchTab(tabId) {
       currentTab = tabId;
+
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const isActive = btn.dataset.tab === tabId;
         if (isActive) {
@@ -1320,7 +1411,7 @@
         }
       });
 
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
       const activePanel = document.getElementById(`tab-${tabId}`);
       if (activePanel) activePanel.classList.remove('hidden');
 
@@ -1330,7 +1421,7 @@
     }
 
     // =========================================================================
-    // 5. GLOBAL INTERACTIVE CROSS-FILTERING
+    // 5. FILTER POPULATION & CROSS-FILTERING
     // =========================================================================
     function populateFilters(preserveSelection = false) {
       const L = t().filters;
@@ -1338,15 +1429,13 @@
       const selType  = document.getElementById('filterType');
       const selAge   = document.getElementById('filterAge');
       const selDay   = document.getElementById('filterDay');
-      const selDate  = document.getElementById('filterDate');
 
       const prev = preserveSelection ? {
         sport: selSport.value,
         type:  selType.value,
         age:   selAge.value,
-        day:   selDay.value,
-        date:  selDate.value
-      } : { sport: 'ALL', type: 'ALL', age: 'ALL', day: 'ALL', date: 'ALL' };
+        day:   selDay.value
+      } : { sport: 'ALL', type: 'ALL', age: 'ALL', day: 'ALL' };
 
       selSport.innerHTML = `<option value="ALL">${L.allSports}</option>` +
         ALL_SPORTS.map(s => `<option value="${s}">${sportLabel(s)}</option>`).join('');
@@ -1366,18 +1455,192 @@
       selDay.innerHTML = `<option value="ALL">${L.allDays}</option>` +
         ALL_DAYS.map(d => `<option value="${d}">${dayLabel(d)}</option>`).join('');
 
-      selDate.innerHTML = `<option value="ALL">${L.allDates}</option>` +
-        ALL_DATES.map(dt => {
-          const dayKey = DATA.find(r => r.date === dt)?.day || '';
-          return `<option value="${dt}">${dt} (${dayLabel(dayKey)})</option>`;
-        }).join('');
-
       selSport.value = prev.sport;
       selType.value  = prev.type;
       selAge.value   = prev.age;
       selDay.value   = prev.day;
-      selDate.value  = prev.date;
+
+      updateDatePickerLabel();
+      renderDateRangeCalendar();
     }
+
+    // =========================================================================
+    // 5B. SMART INTERACTIVE CALENDAR DATE RANGE PICKER (Nov 2026)
+    // =========================================================================
+    function toggleDatePopover(forceState) {
+      const pop = document.getElementById('dateRangePopover');
+      const shouldOpen = typeof forceState === 'boolean' ? forceState : pop.classList.contains('hidden');
+      if (shouldOpen) {
+        draftStart = dateRangeStart;
+        draftEnd = dateRangeEnd;
+        hoverDate = null;
+        pop.classList.remove('hidden');
+        renderDateRangeCalendar();
+      } else {
+        pop.classList.add('hidden');
+        hoverDate = null;
+      }
+    }
+
+    function updateDatePickerLabel() {
+      const L = t().filters;
+      const lbl = document.getElementById('dateRangeLabel');
+      const btn = document.getElementById('dateRangeTrigger');
+      if (!dateRangeStart) {
+        lbl.textContent = L.allDates;
+        btn.classList.remove('border-indigo-500', 'bg-indigo-50/40', 'text-indigo-800');
+      } else if (dateRangeStart && (!dateRangeEnd || dateRangeStart === dateRangeEnd)) {
+        lbl.textContent = dateRangeStart;
+        btn.classList.add('border-indigo-500', 'bg-indigo-50/40', 'text-indigo-800');
+      } else {
+        lbl.textContent = `${dateRangeStart.slice(5)} → ${dateRangeEnd.slice(5)}`;
+        btn.classList.add('border-indigo-500', 'bg-indigo-50/40', 'text-indigo-800');
+      }
+    }
+
+    function renderDateRangeCalendar() {
+      const L = t().filters;
+      document.getElementById('calMonthTitle').textContent = L.calMonth;
+      document.getElementById('calFromLbl').textContent = L.calFrom;
+      document.getElementById('calToLbl').textContent = L.calTo;
+      document.getElementById('calClearBtn').textContent = L.calClear;
+      document.getElementById('calDoneBtn').textContent = L.calDone;
+
+      const hintEl = document.getElementById('calSelectionHint');
+      if (!draftStart) hintEl.textContent = L.calHintStart;
+      else if (!draftEnd) hintEl.textContent = L.calHintEnd;
+      else hintEl.textContent = L.calHintReady;
+
+      document.getElementById('calFromVal').textContent = draftStart || '—';
+      document.getElementById('calToVal').textContent = draftEnd || '—';
+
+      // Render single-click "All Days" button only (weekly presets removed)
+      const isAllActive = !dateRangeStart && !draftStart;
+      const allCls = isAllActive
+        ? 'bg-indigo-600 text-white border-indigo-600'
+        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200';
+      document.getElementById('datePresetsRow').innerHTML = `
+        <button type="button" onclick="clearDateRange()" class="w-full px-3 py-1.5 rounded-xl border text-xs font-bold transition cursor-pointer ${allCls}">${L.presetAll}</button>
+      `;
+
+      // Weekday headers (Saturday -> Friday)
+      document.getElementById('calWeekdaysRow').innerHTML = L.calWeekdays.map(w => `<div class="py-1">${w}</div>`).join('');
+
+      // November 2026: Nov 1, 2026 is Sunday -> offset 1 when week starts Saturday (Sat=0, Sun=1)
+      const firstDayOffset = 1;
+      const daysInMonth = 30;
+      const effStart = draftStart && hoverDate && !draftEnd
+        ? (hoverDate < draftStart ? hoverDate : draftStart)
+        : draftStart;
+      const effEnd = draftStart && hoverDate && !draftEnd
+        ? (hoverDate < draftStart ? draftStart : hoverDate)
+        : (draftEnd || draftStart);
+
+      let html = '';
+      for (let i = 0; i < firstDayOffset; i++) {
+        html += `<div></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = `2026-11-${String(d).padStart(2, '0')}`;
+        const hasData = ACTIVE_DATES_SET.has(iso);
+        const isStart = effStart && iso === effStart;
+        const isEnd   = effEnd && iso === effEnd;
+        const inRange = effStart && effEnd && iso > effStart && iso < effEnd;
+
+        let cls = 'text-slate-400 hover:bg-slate-100';
+        if (hasData) cls = 'text-slate-800 font-bold hover:bg-indigo-50 hover:text-indigo-700';
+        if (inRange) cls = 'bg-indigo-100 text-indigo-900 font-bold';
+        if (isStart || isEnd) cls = 'bg-indigo-600 text-white font-extrabold shadow-xs';
+
+        const dot = hasData
+          ? `<span class="w-1 h-1 rounded-full ${(isStart || isEnd) ? 'bg-emerald-300' : 'bg-emerald-500'}"></span>`
+          : `<span class="w-1 h-1"></span>`;
+
+        html += `
+          <button type="button"
+            onclick="onCalendarDayClick('${iso}')"
+            onmouseenter="onCalendarDayHover('${iso}')"
+            class="h-9 rounded-lg flex flex-col items-center justify-center gap-0.5 text-xs transition cursor-pointer ${cls}">
+            <span>${d}</span>
+            ${dot}
+          </button>
+        `;
+      }
+      document.getElementById('calDaysGrid').innerHTML = html;
+    }
+
+    function onCalendarDayClick(iso) {
+      if (!draftStart || (draftStart && draftEnd)) {
+        // 1st click: pick start date only — keep popover open and wait for 2nd click (or Done)
+        draftStart = iso;
+        draftEnd = null;
+        hoverDate = null;
+        renderDateRangeCalendar();
+      } else {
+        // 2nd click: complete range, commit filter, and close popover automatically
+        if (iso < draftStart) {
+          draftEnd = draftStart;
+          draftStart = iso;
+        } else {
+          draftEnd = iso;
+        }
+        dateRangeStart = draftStart;
+        dateRangeEnd = draftEnd;
+        hoverDate = null;
+        updateDatePickerLabel();
+        renderDateRangeCalendar();
+        applyFilters();
+        toggleDatePopover(false);
+      }
+    }
+
+    function onCalendarDayHover(iso) {
+      if (draftStart && !draftEnd && hoverDate !== iso) {
+        hoverDate = iso;
+        renderDateRangeCalendar();
+      }
+    }
+
+    function applyCalendarDone() {
+      // Commit whatever is currently selected (single day if only 1 click, or full range, or all)
+      if (draftStart && !draftEnd) {
+        dateRangeStart = draftStart;
+        dateRangeEnd = draftStart;
+      } else if (draftStart && draftEnd) {
+        dateRangeStart = draftStart;
+        dateRangeEnd = draftEnd;
+      } else {
+        dateRangeStart = null;
+        dateRangeEnd = null;
+      }
+      hoverDate = null;
+      updateDatePickerLabel();
+      applyFilters();
+      toggleDatePopover(false);
+    }
+
+    function clearDateRange() {
+      // Single-click immediate reset to all days
+      draftStart = null;
+      draftEnd = null;
+      dateRangeStart = null;
+      dateRangeEnd = null;
+      hoverDate = null;
+      updateDatePickerLabel();
+      renderDateRangeCalendar();
+      applyFilters();
+      toggleDatePopover(false);
+    }
+
+    // Close calendar popover when clicking outside
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('datePickerWrapper');
+      const pop = document.getElementById('dateRangePopover');
+      if (wrapper && pop && !pop.classList.contains('hidden') && !wrapper.contains(e.target)) {
+        toggleDatePopover(false);
+      }
+    });
 
     function updateFilteredBadge() {
       const count = filteredData.length;
@@ -1392,14 +1655,15 @@
       const type  = document.getElementById('filterType').value;
       const age   = document.getElementById('filterAge').value;
       const day   = document.getElementById('filterDay').value;
-      const date  = document.getElementById('filterDate').value;
+      const activeStart = dateRangeStart;
+      const activeEnd   = dateRangeEnd || dateRangeStart;
 
       filteredData = DATA.filter(row => {
         if (sport !== 'ALL' && row.sport !== sport) return false;
         if (type  !== 'ALL' && row.type  !== type)  return false;
         if (age   !== 'ALL' && row.age   !== age)   return false;
         if (day   !== 'ALL' && row.day   !== day)   return false;
-        if (date  !== 'ALL' && row.date  !== date)  return false;
+        if (activeStart && (row.date < activeStart || row.date > activeEnd)) return false;
         return true;
       });
 
@@ -1412,7 +1676,14 @@
       document.getElementById('filterType').value  = 'ALL';
       document.getElementById('filterAge').value   = 'ALL';
       document.getElementById('filterDay').value   = 'ALL';
-      document.getElementById('filterDate').value  = 'ALL';
+      dateRangeStart = null;
+      dateRangeEnd = null;
+      draftStart = null;
+      draftEnd = null;
+      hoverDate = null;
+      updateDatePickerLabel();
+      renderDateRangeCalendar();
+      toggleDatePopover(false);
       const searchEl = document.getElementById('txSearchInput');
       if (searchEl) searchEl.value = '';
       applyFilters();
@@ -1437,21 +1708,10 @@
       const map = {};
       ALL_SPORTS.forEach(s => {
         map[s] = {
-          sport: s,
-          count: 0,
-          revenue: 0,
-          members: new Set(),
-          min: Infinity,
-          max: -Infinity,
-          ptCount: 0,
-          ptRev: 0,
-          groupCount: 0,
-          groupRev: 0,
-          kidsCount: 0,
-          kidsRev: 0,
-          adultsCount: 0,
-          adultsRev: 0,
-          kidsPtCount: 0
+          sport: s, count: 0, revenue: 0, members: new Set(),
+          min: Infinity, max: -Infinity,
+          ptCount: 0, ptRev: 0, groupCount: 0, groupRev: 0,
+          kidsCount: 0, kidsRev: 0, adultsCount: 0, adultsRev: 0, kidsPtCount: 0
         };
       });
 
@@ -1463,13 +1723,8 @@
         s.members.add(r.member);
         if (r.amount < s.min) s.min = r.amount;
         if (r.amount > s.max) s.max = r.amount;
-        if (r.type === 'PT') {
-          s.ptCount++;
-          s.ptRev += r.amount;
-        } else {
-          s.groupCount++;
-          s.groupRev += r.amount;
-        }
+        if (r.type === 'PT') { s.ptCount++; s.ptRev += r.amount; }
+        else { s.groupCount++; s.groupRev += r.amount; }
         if (r.age === 'Kids') {
           s.kidsCount++;
           s.kidsRev += r.amount;
@@ -1545,13 +1800,14 @@
         document.getElementById('kpiTopDaySub').textContent = L.noData;
       }
 
+      // Quick Executive Banner
       const ptRows = rows.filter(r => r.type === 'PT');
       const grpRows = rows.filter(r => r.type === 'Group');
       const kidsRows = rows.filter(r => r.age === 'Kids');
       const ptRev = ptRows.reduce((s, r) => s + r.amount, 0);
       const kidsRev = kidsRows.reduce((s, r) => s + r.amount, 0);
-      const top3 = byRev.slice(0, 3).filter(s => s.revenue > 0);
-      const top3Rev = top3.reduce((a, b) => a + b.revenue, 0);
+      const top3Names = byRev.slice(0, 3).filter(s => s.revenue > 0).map(s => sportLabel(s.sport)).join(isAr ? '، ' : ', ');
+      const top3RevSum = byRev.slice(0, 3).reduce((a, b) => a + b.revenue, 0);
 
       document.getElementById('executiveBannerGrid').innerHTML = `
         <div class="p-3.5 rounded-xl bg-white/8 border border-white/10">
@@ -1566,19 +1822,19 @@
         </div>
         <div class="p-3.5 rounded-xl bg-white/8 border border-white/10">
           <p class="text-slate-300 text-[11px] font-semibold">${L.hl3Title}</p>
-          <p class="mt-1 font-bold text-white">${top3.length ? `${L.hlTop3Prefix} ${top3.map(s => sportLabel(s.sport)).join(isAr ? '، ' : ', ')}` : L.noData}</p>
-          <p class="text-indigo-300 text-[11px] mt-1">${L.hlTop3Share(fmtPct(top3Rev, totalRev))}</p>
+          <p class="mt-1 font-bold text-white">${activeSports.length ? `${L.hlTop3Prefix} ${top3Names}` : L.noData}</p>
+          <p class="text-indigo-300 text-[11px] mt-1">${L.hlTop3Share(fmtPct(top3RevSum, totalRev))}</p>
         </div>
       `;
 
-      // Chart 1A: Revenue by Sport
+      // Chart 1A: Revenue by Sport (Horizontal Bar)
       destroyChart('overviewRev');
       charts.overviewRev = new Chart(document.getElementById('chartOverviewRev').getContext('2d'), {
         type: 'bar',
         data: {
           labels: byRev.map(s => sportLabel(s.sport)),
           datasets: [{
-            label: L.kpiTotalRev,
+            label: L.chartRevTitle,
             data: byRev.map(s => s.revenue),
             backgroundColor: byRev.map(s => SPORT_COLORS[s.sport]),
             borderRadius: 8,
@@ -1604,7 +1860,7 @@
         }
       });
 
-      // Chart 1B: Subscriptions Share by Sport
+      // Chart 1B: Subscriptions Share by Sport (Doughnut)
       destroyChart('overviewShare');
       charts.overviewShare = new Chart(document.getElementById('chartOverviewShare').getContext('2d'), {
         type: 'doughnut',
@@ -1643,7 +1899,6 @@
     // =========================================================================
     function renderSportsTab() {
       const L = t().sports;
-      const P = t().ptKids;
       const rows = filteredData;
       const totalCount = rows.length;
       const totalRev = rows.reduce((s, r) => s + r.amount, 0);
@@ -1723,12 +1978,13 @@
         <tr>${L.cols.map(c => `<th class="py-3.5 px-4 font-bold text-start whitespace-nowrap">${c}</th>`).join('')}</tr>
       `;
 
+      const ptL = t().ptKids;
       document.getElementById('sportsRankTableBody').innerHTML = byRev.map((s, idx) => {
         let domBadge = '—';
         if (s.count > 0) {
-          if (s.ptCount > s.groupCount) domBadge = `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">${P.domPT}</span>`;
-          else if (s.groupCount > s.ptCount) domBadge = `<span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold">${P.domGroup}</span>`;
-          else domBadge = `<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold">${P.domTie}</span>`;
+          if (s.ptCount > s.groupCount) domBadge = `<span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-bold">${ptL.domPT}</span>`;
+          else if (s.groupCount > s.ptCount) domBadge = `<span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">${ptL.domGroup}</span>`;
+          else domBadge = `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-bold">${ptL.domTie}</span>`;
         }
         return `
           <tr class="hover:bg-slate-50/90 transition-colors">
@@ -1754,25 +2010,21 @@
       renderTransactionsTable();
     }
 
-    function sortTransactions(key) {
+    function sortTx(key) {
       if (txSortKey === key) txSortAsc = !txSortAsc;
-      else {
-        txSortKey = key;
-        txSortAsc = key !== 'amount';
-      }
+      else { txSortKey = key; txSortAsc = true; }
       renderTransactionsTable();
     }
 
     function renderTransactionsTable() {
       const L = t().sports;
-      const isAr = currentLang === 'ar';
       const q = (document.getElementById('txSearchInput')?.value || '').trim().toLowerCase();
 
       document.getElementById('txTableHead').innerHTML = `
         <tr>
           ${L.txCols.map(c => {
-            const arrow = txSortKey === c.key ? (txSortAsc ? ' ▲' : ' ▼') : '';
-            return `<th onclick="sortTransactions('${c.key}')" class="py-3 px-4 font-bold text-start whitespace-nowrap cursor-pointer hover:text-indigo-700 select-none">${c.label}${arrow}</th>`;
+            const arrow = txSortKey === c.key ? (txSortAsc ? ' ↑' : ' ↓') : '';
+            return `<th onclick="sortTx('${c.key}')" class="py-3 px-4 font-bold text-start whitespace-nowrap cursor-pointer hover:text-indigo-700 select-none">${c.label}${arrow}</th>`;
           }).join('')}
         </tr>
       `;
@@ -1788,7 +2040,7 @@
         let va = a[txSortKey], vb = b[txSortKey];
         if (txSortKey === 'amount') return txSortAsc ? va - vb : vb - va;
         if (txSortKey === 'sport') { va = sportLabel(va); vb = sportLabel(vb); }
-        if (txSortKey === 'day')   { va = dayLabel(va);   vb = dayLabel(vb); }
+        if (txSortKey === 'day') { va = dayLabel(va); vb = dayLabel(vb); }
         return txSortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
       });
 
@@ -1796,32 +2048,31 @@
       if (rows.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-semibold">${L.noTx}</td></tr>`;
       } else {
-        tbody.innerHTML = rows.map(r => {
-          const typeText = r.type === 'PT' ? (isAr ? 'PT خاص' : 'PT') : (isAr ? 'Group جماعي' : 'Group');
-          const ageText  = r.age === 'Kids' ? (isAr ? 'أطفال (K)' : 'Kids (K)') : (isAr ? 'بالغين' : 'Adults');
-          const nText    = noteLabel(r.notes);
-          return `
-            <tr class="hover:bg-slate-50/90 transition-colors">
-              <td class="py-2.5 px-4 font-semibold text-slate-600 whitespace-nowrap" dir="ltr">${r.date}</td>
-              <td class="py-2.5 px-4 font-semibold text-slate-700 whitespace-nowrap">${dayLabel(r.day)}</td>
-              <td class="py-2.5 px-4 font-bold text-slate-900">${escapeHtml(r.member)}</td>
-              <td class="py-2.5 px-4 whitespace-nowrap">
-                <span class="inline-flex items-center gap-1.5 font-bold text-slate-800">
-                  <span class="w-2 h-2 rounded-full" style="background:${SPORT_COLORS[r.sport]}"></span>
-                  ${sportLabel(r.sport)}
-                </span>
-              </td>
-              <td class="py-2.5 px-4 whitespace-nowrap">
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.type === 'PT' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-50 text-indigo-700'}">${typeText}</span>
-              </td>
-              <td class="py-2.5 px-4 whitespace-nowrap">
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.age === 'Kids' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">${ageText}</span>
-              </td>
-              <td class="py-2.5 px-4 font-extrabold text-emerald-700 whitespace-nowrap">${fmtCur(r.amount)}</td>
-              <td class="py-2.5 px-4 text-slate-500 font-medium">${nText ? `<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/60">${escapeHtml(nText)}</span>` : '—'}</td>
-            </tr>
-          `;
-        }).join('');
+        tbody.innerHTML = rows.map(r => `
+          <tr class="hover:bg-slate-50/90 transition-colors">
+            <td class="py-2.5 px-4 font-semibold text-slate-600 whitespace-nowrap" dir="ltr">${r.date}</td>
+            <td class="py-2.5 px-4 font-semibold text-slate-700 whitespace-nowrap">${dayLabel(r.day)}</td>
+            <td class="py-2.5 px-4 font-bold text-slate-900">${escapeHtml(r.member)}</td>
+            <td class="py-2.5 px-4 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 font-bold text-slate-800">
+                <span class="w-2 h-2 rounded-full" style="background:${SPORT_COLORS[r.sport]}"></span>
+                ${sportLabel(r.sport)}
+              </span>
+            </td>
+            <td class="py-2.5 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.type === 'PT' ? 'bg-amber-100 text-amber-800' : 'bg-indigo-50 text-indigo-700'}">
+                ${r.type === 'PT' ? t().filters.typePT : t().filters.typeGroup}
+              </span>
+            </td>
+            <td class="py-2.5 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-bold ${r.age === 'Kids' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">
+                ${r.age === 'Kids' ? t().filters.ageKids : t().filters.ageAdults}
+              </span>
+            </td>
+            <td class="py-2.5 px-4 font-extrabold text-emerald-700 whitespace-nowrap">${fmtCur(r.amount)}</td>
+            <td class="py-2.5 px-4 text-slate-500 font-medium">${r.notes ? `<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/60">${escapeHtml(noteLabel(r.notes))}</span>` : '—'}</td>
+          </tr>
+        `).join('');
       }
 
       const sum = rows.reduce((acc, r) => acc + r.amount, 0);
@@ -1851,7 +2102,7 @@
         data: {
           labels: dayStats.map(d => d.day === 'الجمعة' ? `${dayLabel(d.day)}*` : dayLabel(d.day)),
           datasets: [{
-            label: L.btnCount,
+            label: L.daysCountTitle,
             data: dayStats.map(d => d.count),
             backgroundColor: dayStats.map(d => d.day === 'الجمعة' ? '#94A3B8' : '#4F46E5'),
             borderRadius: 8,
@@ -1883,7 +2134,7 @@
         data: {
           labels: dayStats.map(d => d.day === 'الجمعة' ? `${dayLabel(d.day)}*` : dayLabel(d.day)),
           datasets: [{
-            label: L.btnRev,
+            label: L.daysRevTitle,
             data: dayStats.map(d => d.revenue),
             backgroundColor: dayStats.map(d => d.day === 'الجمعة' ? '#94A3B8' : '#10B981'),
             borderRadius: 8,
@@ -1971,8 +2222,14 @@
         btnRev.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer';
       }
 
+      const activeStart = dateRangeStart;
+      const activeEnd   = dateRangeEnd || dateRangeStart;
+      const visibleDates = activeStart
+        ? ALL_DATES.filter(dt => dt >= activeStart && dt <= activeEnd)
+        : ALL_DATES;
+
       const dateMap = {};
-      ALL_DATES.forEach(dt => {
+      visibleDates.forEach(dt => {
         const dayKey = DATA.find(d => d.date === dt)?.day || '';
         dateMap[dt] = { label: `${dt.slice(5)} (${dayLabel(dayKey)})`, count: 0, revenue: 0 };
       });
@@ -1985,8 +2242,8 @@
       });
 
       const isRev = dailyTrendMode === 'revenue';
-      const labels = ALL_DATES.map(dt => dateMap[dt].label);
-      const values = ALL_DATES.map(dt => isRev ? dateMap[dt].revenue : dateMap[dt].count);
+      const labels = visibleDates.map(dt => dateMap[dt].label);
+      const values = visibleDates.map(dt => isRev ? dateMap[dt].revenue : dateMap[dt].count);
 
       destroyChart('dailyTrend');
       charts.dailyTrend = new Chart(document.getElementById('chartDailyTrend').getContext('2d'), {
